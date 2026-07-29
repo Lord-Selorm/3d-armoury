@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Burma Camp Armoury — Digital Twin</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id=load><div class=spinner></div><span>LOADING ARMOURY…</span></div>
+<div id=toast></div>
+<div id=badge></div>
+<div id=vignette></div>
+<div id=grain></div>
+<div id=rst>↺ Reset all</div>
+<div id=log><h2>Audit Log<button onclick="this.parentElement.style.display='none'" style="float:right;background:0 0;border:none;color:#6a6a7a;cursor:pointer;font-size:16px;line-height:1">✕</button></h2><div class=lBody id=lBody></div></div>
+<div id=inspInfo></div>
+<div id=inspBlur></div>
+<canvas id=inspGun></canvas>
+<input id=search placeholder="🔍 Search rack (e.g. RDF,81S,SC)…">
+<div id=stats><h2>📊 Armoury Statistics<button onclick="this.parentElement.style.display='none'" style="float:right;background:0 0;border:none;color:#6a6a7a;cursor:pointer;font-size:16px;line-height:1">✕</button></h2><div id=statsBody></div></div>
+<button id=exportBtn>📥 Export CSV</button>
+<div id=walkInd>🚶 Walking</div>
+<canvas id=map width=120 height=80></canvas>
+<canvas id=qrcode width=144 height=144></canvas>
+<div style="position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:10;pointer-events:none;text-align:center;color:#f0e8e0;font-size:15px;font-family:'Segoe UI',Arial,sans-serif;opacity:.92;text-shadow:0 1px 8px rgba(0,0,0,.95),0 0 3px #000">Click gun = checkout · <kbd style="font-size:12px;background:rgba(0,0,0,.4);border:1px solid #8a7a6a;padding:0 5px;border-radius:2px;font-family:monospace;color:#f0e8e0">Ctrl</kbd>+click = inspect · Drag to rotate · Click red = restore · Right‑click rack = restore · Click rack = focus · <kbd style="font-size:12px;background:rgba(0,0,0,.4);border:1px solid #8a7a6a;padding:0 5px;border-radius:2px;font-family:monospace;color:#f0e8e0">R</kbd> reset · <kbd style="font-size:12px;background:rgba(0,0,0,.4);border:1px solid #8a7a6a;padding:0 5px;border-radius:2px;font-family:monospace;color:#f0e8e0">L</kbd> log · <kbd style="font-size:12px;background:rgba(0,0,0,.4);border:1px solid #8a7a6a;padding:0 5px;border-radius:2px;font-family:monospace;color:#f0e8e0">H</kbd> help · WASD+Q/E move</div>
+<div id=help onclick="this.style.display='none'">
+<in onclick="event.stopPropagation()">
+<h2>Controls</h2>
+<r><span><k>Left‑click</k> gun</span><span>Check out</span></r>
+<r><span><k>Ctrl+click</k> gun</span><span>Inspect · drag to rotate</span></r>
+<r><span><k>Left‑click</k> red light</span><span>Restore gun</span></r>
+<r><span><k>Right‑click</k> rack</span><span>Restore last</span></r>
+<r><span><k>Left‑click</k> rack</span><span>Focus camera</span></r>
+<r><span><k>Esc</k></span><span>Reset camera</span></r>
+<r><span><k>W</k><k>A</k><k>S</k><k>D</k> / arrows</span><span>Move</span></r>
+<r><span><k>Q</k> / <k>E</k></span><span>Move down / up</span></r>
+<r><span>Drag</span><span>Orbit camera</span></r>
+<r><span>Scroll</span><span>Zoom</span></r>
+<r><span><k>R</k></span><span>Reset all guns</span></r>
+<r><span><k>L</k></span><span>Toggle audit log</span></r>
+<r><span><k>H</k> / <k>?</k></span><span>Toggle help</span></r>
+  <r><span><k>T</k></span><span>Statistics dashboard</span></r>
+<r><span><k>U</k></span><span>Toggle wireframe overlay</span></r>
+<r><span><k>M</k></span><span>Toggle walking mode</span></r>
+<r><span><k>/</k> / <k>F</k></span><span>Search rack</span></r>
+<r><span><k>1</k>–<k>4</k></span><span>Preset views</span></r>
+<r><span><k>Ctrl+Z</k></span><span>Undo last checkout</span></r>
+<div class=hint>Data saves automatically to your browser · Mini‑map shows rack status</div>
+</in>
+</div>
+
+<script type=importmap>
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<script type=module src="script.js"></script>
+</body>
+</html>

@@ -14,7 +14,7 @@ cam.position.set(0,3.2,4.5)
 const rdr=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})
 rdr.setSize(innerWidth,innerHeight)
 rdr.toneMapping=T.ACESFilmicToneMapping
-rdr.toneMappingExposure=.9
+rdr.toneMappingExposure=1.5
 rdr.shadowMap.enabled=true
 rdr.shadowMap.type=T.PCFSoftShadowMap
 rdr.outputColorSpace=T.SRGBColorSpace
@@ -85,8 +85,8 @@ rowsZ.forEach(z=>{
 })
 
 // ── LIGHTING ──
-const ambient=new T.AmbientLight(0xfff5ee,.3);sc.add(ambient)
-const kl=new T.DirectionalLight(0xfff0e0,8)
+const ambient=new T.AmbientLight(0xfff5ee,.5);sc.add(ambient)
+const kl=new T.DirectionalLight(0xfff0e0,14)
 kl.position.set(10,14,6);kl.castShadow=true
 kl.shadow.mapSize.set(4096,4096)
 kl.shadow.camera.near=.5;kl.shadow.camera.far=24
@@ -445,7 +445,7 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
   const pmrem=new T.PMREMGenerator(rdr)
   const envMap=pmrem.fromEquirectangular(hdr).texture
   sc.environment=envMap;sc.background=envMap
-  sc.environmentIntensity=1.4
+  sc.environmentIntensity=2.0
   pmrem.dispose()
 
   // ── PREPARE MODELS ──

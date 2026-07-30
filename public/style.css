@@ -34,7 +34,6 @@ body{overflow:hidden;background:#08080c;font-family:'Segoe UI',Arial,sans-serif}
 #map:hover{width:320px;height:200px;z-index:12;border-color:#5a5a6a}
 #search{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:11;display:none;background:rgba(10,10,18,.92);border:1px solid #5a4a3a;border-radius:6px;padding:4px 12px;font:13px/1.6 'Segoe UI',Arial,sans-serif;color:#e8d8c0;outline:none;width:240px;backdrop-filter:blur(6px)}
 #search::placeholder{color:#6a6a7a}
-#vignette{position:fixed;inset:0;z-index:8;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.75) 100%)}
 #stats{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:150;display:none;background:rgba(12,12,20,.96);color:#d8cbb8;border-radius:8px;border:1.5px solid #5a4a3a;padding:20px 28px;font:12px/1.6 'Segoe UI',Arial,sans-serif;min-width:300px;max-width:90%;max-height:80vh;flex-direction:column;pointer-events:auto;overflow-y:auto}
 #stats h2{color:#f0e4cc;font-size:15px;font-weight:700;margin-bottom:10px;letter-spacing:1px}
 #stats .sRow{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #2a2a34}
@@ -44,5 +43,5 @@ body{overflow:hidden;background:#08080c;font-family:'Segoe UI',Arial,sans-serif}
 #walkInd{position:fixed;bottom:44px;left:14px;z-index:10;background:rgba(8,8,12,.75);color:#887a66;padding:4px 10px;border-radius:4px;font:11px/1.4 'Segoe UI',Arial,sans-serif;border:1px solid #3a3a44;display:none;pointer-events:none}
 #walkInd.on{color:#b8d8b8;border-color:#4a6a4a}
 #qrcode{position:fixed;bottom:14px;right:14px;z-index:12;width:72px;height:72px;border:2px solid #3a3a44;border-radius:4px;display:none;background:#fff;cursor:pointer}
-#vignette{position:fixed;inset:0;z-index:9;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.75) 100%)}
+#vignette{position:fixed;inset:0;z-index:9;pointer-events:none;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.85) 100%)}
 #grain{position:fixed;inset:0;z-index:8;pointer-events:none;opacity:.035;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-repeat:repeat;mix-blend-mode:overlay;background-color:rgba(0,0,0,.15)}

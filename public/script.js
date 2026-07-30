@@ -14,7 +14,7 @@ cam.position.set(0,3.2,4.5)
 const rdr=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})
 rdr.setSize(innerWidth,innerHeight)
 rdr.toneMapping=T.ACESFilmicToneMapping
-rdr.toneMappingExposure=.9
+rdr.toneMappingExposure=1.0
 rdr.shadowMap.enabled=true
 rdr.shadowMap.type=T.PCFSoftShadowMap
 rdr.outputColorSpace=T.SRGBColorSpace
@@ -103,6 +103,7 @@ fl1.shadow.camera.top=10;fl1.shadow.camera.bottom=-4
 fl1.shadow.bias=-.0005;fl1.shadow.normalBias=.01
 sc.add(fl1)
 const rimL=new T.DirectionalLight(0xffeecc,3);rimL.position.set(5,8,8);sc.add(rimL)
+const blimL=new T.DirectionalLight(0xffddbb,5);blimL.position.set(-2,4,-4);sc.add(blimL)
 const bncL=new T.DirectionalLight(0x887a6a,.6);bncL.position.set(0,-2,0);sc.add(bncL)
 for(let x=-1;x<=1;x+=2)
   for(let z=-1;z<=1;z+=2){

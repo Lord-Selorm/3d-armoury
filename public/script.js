@@ -547,7 +547,12 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
   function placeGuns(rack,template,n,side,slant,rackW,tint,offset=0,total=n,gunType){
     const aW=rackW-AB*2
     const H=2.0,D=.62
-    const iGeo=new T.SphereGeometry(.025,8,6)
+    const iGeo=new T.SphereGeometry(.035,10,8)
+    const iGlowC=document.createElement('canvas');iGlowC.width=64;iGlowC.height=64
+    const igc=iGlowC.getContext('2d');const igrd=igc.createRadialGradient(32,32,0,32,32,32)
+    igrd.addColorStop(0,'rgba(255,255,255,1)');igrd.addColorStop(.15,'rgba(255,255,200,.6)');igrd.addColorStop(.5,'rgba(200,255,200,.2)');igrd.addColorStop(1,'rgba(255,255,255,0)')
+    igc.fillStyle=igrd;igc.fillRect(0,0,64,64)
+    const iGlowTex=new T.CanvasTexture(iGlowC)
     const sd=side===-1?'A1':'A2'
     const arr=sd==='A1'?rack.userData.a1G:rack.userData.a2G
     for(let i=0;i<n;i++){
@@ -574,12 +579,16 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
       w.position.set(x,y,z)
       w.rotation.x=side*slant
       w.userData={isGun:true,side:sd,slot:i,gunType:gunType||''}
-      const iMat=new T.MeshStandardMaterial({color:'#22cc44',emissive:'#33ee55',emissiveIntensity:1.2,roughness:.2,metalness:0})
+      const iMat=new T.MeshStandardMaterial({color:'#22ee44',emissive:'#33ff55',emissiveIntensity:3,roughness:.1,metalness:0})
       const ind=new T.Mesh(iGeo,iMat)
       ind.position.set(x,y+.4,z-side*.15)
       ind.userData={isInd:true,gunW:w}
       rack.add(ind)
+      const iGlow=new T.Sprite(new T.SpriteMaterial({map:iGlowTex,transparent:true,blending:T.AdditiveBlending,depthWrite:false,opacity:.7}))
+      iGlow.position.set(x,y+.4,z-side*.15);iGlow.scale.set(.2,.2,1)
+      rack.add(iGlow)
       w.userData.indEl=ind
+      w.userData.glowEl=iGlow
       arr.push(w)
       rack.add(w)
       const st=silMat.clone();st.map=silTex(gunType||'m16',.6,.3)
@@ -797,7 +806,8 @@ function checkoutGun(gunW){
   gunW.userData._oscl=gunW.scale.clone()
   const sz=gunW.position.z,ez=sz+(side==='A1'?-.3:.3)
   _anims.push({gw:gunW,pSz:sz,pEz:ez,sSz:1,sEz:.4,t:0})
-  if(gunW.userData.indEl){const m=gunW.userData.indEl.material;m.color.set('#cc2222');m.emissive.set('#cc2222');m.emissiveIntensity=1.5}
+  if(gunW.userData.indEl){const m=gunW.userData.indEl.material;m.color.set('#ff2222');m.emissive.set('#ff2222');m.emissiveIntensity=4}
+  if(gunW.userData.glowEl){gunW.userData.glowEl.material.color.set('#ff4444')}
   updateRackLabel(rd)
   if(!_loadingState){
     _psave();_pupdate();updateBadge();drawMap();addLog(`${rd.rackId} ${side} #${gunW.userData.slot+1} → OUT`)
@@ -817,7 +827,8 @@ function restoreGun(rack){
   const side=gunW.userData.side
   const k=side.toLowerCase()+'Rem'
   rd[k]++;animateIn(gunW,rack,side)
-  if(gunW.userData.indEl){const m=gunW.userData.indEl.material;m.color.set('#22cc44');m.emissive.set('#22cc44');m.emissiveIntensity=.8}
+  if(gunW.userData.indEl){const m=gunW.userData.indEl.material;m.color.set('#22ee44');m.emissive.set('#33ff55');m.emissiveIntensity=3}
+  if(gunW.userData.glowEl){gunW.userData.glowEl.material.color.set('#44ff66')}
   updateRackLabel(rd)
   if(!_loadingState){
     const wp=new T.Vector3();gunW.getWorldPosition(wp)
@@ -841,7 +852,8 @@ function restoreSpecificGun(gunW,rack){
   const side=gunW.userData.side
   const k=side.toLowerCase()+'Rem'
   rd[k]++;animateIn(gunW,rack,side)
-  if(gunW.userData.indEl){const m=gunW.userData.indEl.material;m.color.set('#22cc44');m.emissive.set('#22cc44');m.emissiveIntensity=.8}
+  if(gunW.userData.indEl){const m=gunW.userData.indEl.material;m.color.set('#22ee44');m.emissive.set('#33ff55');m.emissiveIntensity=3}
+  if(gunW.userData.glowEl){gunW.userData.glowEl.material.color.set('#44ff66')}
   updateRackLabel(rd)
   const wp=new T.Vector3();gunW.getWorldPosition(wp);burst(wp,8,'#44ff88')
   _psave();_pupdate();updateBadge();drawMap();addLog(`${rd.rackId} ${side} #${gunW.userData.slot+1} ← IN`)
@@ -1008,13 +1020,13 @@ rdr.domElement.addEventListener('mousemove',e=>{
   if(gun!==_prevHover){
     if(_prevHover&&_prevHover.userData.indEl){
       const m=_prevHover.userData.indEl.material
-      m.emissiveIntensity=_prevHover.userData._origEmInt??.8
+      m.emissiveIntensity=_prevHover.userData._origEmInt??3
     }
     _prevHover=gun
     if(gun&&gun.userData.indEl){
       const m=gun.userData.indEl.material
       if(gun.userData._origEmInt==null)gun.userData._origEmInt=m.emissiveIntensity
-      m.emissiveIntensity=2.5
+      m.emissiveIntensity=5
     }
     rdr.domElement.style.cursor=gun?'pointer':'default'
   }

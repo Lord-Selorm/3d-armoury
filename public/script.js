@@ -152,12 +152,12 @@ function mkWoodTex(base,rng,w){
   t.repeat.set(2,1);t.anisotropy=4
   return t
 }
-const wdTex=mkWoodTex(90,25)
-const wlTex=mkWoodTex(125,20)
-const wkTex=mkWoodTex(75,20,64)
-const wd=new T.MeshPhysicalMaterial({map:wdTex,color:0xd8c8a0,roughness:.85,metalness:0,clearcoat:.06,clearcoatRoughness:.4})
-const wl=new T.MeshPhysicalMaterial({map:wlTex,color:0xe4d8b8,roughness:.78,metalness:0,clearcoat:.05,clearcoatRoughness:.5})
-const wk=new T.MeshPhysicalMaterial({map:wkTex,color:0xb8a488,roughness:.9,metalness:0})
+const wdTex=mkWoodTex(160,35)
+const wlTex=mkWoodTex(200,30)
+const wkTex=mkWoodTex(140,30,64)
+const wd=new T.MeshPhysicalMaterial({map:wdTex,color:0xf0e4d0,roughness:.85,metalness:0,clearcoat:.06,clearcoatRoughness:.4})
+const wl=new T.MeshPhysicalMaterial({map:wlTex,color:0xf8f0e0,roughness:.78,metalness:0,clearcoat:.05,clearcoatRoughness:.5})
+const wk=new T.MeshPhysicalMaterial({map:wkTex,color:0xe0d4c0,roughness:.9,metalness:0})
 
 // ── BEAM HELPER ──
 const _v=new T.Vector3()

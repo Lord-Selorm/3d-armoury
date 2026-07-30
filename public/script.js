@@ -444,8 +444,8 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
 
   const pmrem=new T.PMREMGenerator(rdr)
   const envMap=pmrem.fromEquirectangular(hdr).texture
-  sc.environment=envMap;sc.background=envMap
-  sc.environmentIntensity=1.4
+  sc.environment=envMap;sc.background=bgCol
+  sc.environmentIntensity=1.8
   pmrem.dispose()
 
   // ── PREPARE MODELS ──

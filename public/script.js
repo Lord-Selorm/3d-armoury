@@ -103,7 +103,7 @@ kl.shadow.camera.left=-16;kl.shadow.camera.right=16
 kl.shadow.camera.top=14;kl.shadow.camera.bottom=-6
 kl.shadow.bias=-.0008;kl.shadow.normalBias=.02
 sc.add(kl)
-const fl1=new T.DirectionalLight(0xdde0ff,2.5)
+const fl1=new T.DirectionalLight(0xdde0ff,3)
 fl1.position.set(-8,10,-6);fl1.castShadow=true
 fl1.shadow.mapSize.set(2048,2048)
 fl1.shadow.camera.near=.5;fl1.shadow.camera.far=20
@@ -113,6 +113,7 @@ fl1.shadow.bias=-.0005;fl1.shadow.normalBias=.01
 sc.add(fl1)
 const rimL=new T.DirectionalLight(0xffeecc,3);rimL.position.set(5,8,8);sc.add(rimL)
 const blimL=new T.DirectionalLight(0xffe8d0,6);blimL.position.set(0,3,-5);sc.add(blimL)
+const scl=new T.DirectionalLight(0xffeedd,4);scl.position.set(0,5,-8);sc.add(scl)
 const flimL=new T.DirectionalLight(0xccd8ff,.8);flimL.position.set(0,1.5,5);sc.add(flimL)
 const bncL=new T.DirectionalLight(0xa09080,1.2);bncL.position.set(0,-2,0);sc.add(bncL)
 for(let x=-1;x<=1;x+=2)
@@ -124,9 +125,9 @@ km.position.copy(kl.position);sc.add(km)
 
 // ── FLICKERING CEILING LIGHTS ──
 const flickerLights=[]
-for(let i=0;i<6;i++){
-  const px=(Math.random()-.5)*10, pz=(Math.random()-.5)*8-3.5
-  const l=new T.PointLight(0xffeecc,6+Math.random()*2,16)
+for(let i=0;i<8;i++){
+  const px=(Math.random()-.5)*10, pz=(Math.random()-.5)*8-4
+  const l=new T.PointLight(0xffeecc,7+Math.random()*3,16)
   l.position.set(px,4.2,pz)
   l.userData={baseInt:l.intensity,phase:Math.random()*100,spd:.3+Math.random()*.5}
   sc.add(l),flickerLights.push(l)

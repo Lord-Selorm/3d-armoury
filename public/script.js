@@ -14,7 +14,7 @@ cam.position.set(0,3.2,4.5)
 const rdr=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})
 rdr.setSize(innerWidth,innerHeight)
 rdr.toneMapping=T.ACESFilmicToneMapping
-rdr.toneMappingExposure=1.6
+rdr.toneMappingExposure=.9
 rdr.shadowMap.enabled=true
 rdr.shadowMap.type=T.PCFSoftShadowMap
 rdr.outputColorSpace=T.SRGBColorSpace
@@ -79,15 +79,15 @@ rowsZ.forEach(z=>{
   plat.receiveShadow=true;plat.castShadow=true
   sc.add(plat)
   // beveled edge
-  const edge=new T.Mesh(new T.BoxGeometry(pw+.02,.01,pd+.02),new T.MeshPhysicalMaterial({color:'#1e1e22',roughness:.95,metalness:0}))
+  const edge=new T.Mesh(new T.BoxGeometry(pw+.02,.01,pd+.02),new T.MeshPhysicalMaterial({color:'#3a3a3a',roughness:.95,metalness:0}))
   edge.position.set(0,.01,z)
   sc.add(edge)
 })
 
 // ── LIGHTING ──
-const ambient=new T.AmbientLight(0xfff5ee,.5);sc.add(ambient)
-const kl=new T.DirectionalLight(0xfff0e0,14)
-kl.position.set(6,10,4);kl.castShadow=true
+const ambient=new T.AmbientLight(0xfff5ee,.3);sc.add(ambient)
+const kl=new T.DirectionalLight(0xfff0e0,8)
+kl.position.set(10,14,6);kl.castShadow=true
 kl.shadow.mapSize.set(4096,4096)
 kl.shadow.camera.near=.5;kl.shadow.camera.far=24
 kl.shadow.camera.left=-16;kl.shadow.camera.right=16
@@ -95,16 +95,15 @@ kl.shadow.camera.top=14;kl.shadow.camera.bottom=-6
 kl.shadow.bias=-.0008;kl.shadow.normalBias=.02
 sc.add(kl)
 const fl1=new T.DirectionalLight(0xdde0ff,2.5)
-fl1.position.set(-4,8,-4);fl1.castShadow=true
+fl1.position.set(-8,10,-6);fl1.castShadow=true
 fl1.shadow.mapSize.set(2048,2048)
 fl1.shadow.camera.near=.5;fl1.shadow.camera.far=20
 fl1.shadow.camera.left=-12;fl1.shadow.camera.right=12
 fl1.shadow.camera.top=10;fl1.shadow.camera.bottom=-4
 fl1.shadow.bias=-.0005;fl1.shadow.normalBias=.01
 sc.add(fl1)
-const rimL=new T.DirectionalLight(0xffeee0,8);rimL.position.set(-4,6,10);sc.add(rimL)
+const rimL=new T.DirectionalLight(0xffeecc,3);rimL.position.set(5,8,8);sc.add(rimL)
 const bncL=new T.DirectionalLight(0x887a6a,.6);bncL.position.set(0,-2,0);sc.add(bncL)
-const backRim=new T.DirectionalLight(0x88bbff,4);backRim.position.set(4,2,-8);sc.add(backRim)
 for(let x=-1;x<=1;x+=2)
   for(let z=-1;z<=1;z+=2){
     const wl=new T.DirectionalLight(0xfff8f0,.5);wl.position.set(x*5,3,z*3);sc.add(wl)
@@ -129,8 +128,8 @@ for(let i=0;i<6;i++){
 }
 // ── GROUND REFLECTION (envMap sheen on floor) ──
 const shedMat=new T.MeshPhysicalMaterial({
-  color:'#18181c',roughness:.35,metalness:.85,transparent:true,opacity:.04,
-  envMapIntensity:.3,depthWrite:false
+  color:'#18181c',roughness:.35,metalness:.85,transparent:true,opacity:.03,
+  envMapIntensity:.2,depthWrite:false
 })
 const shedPlane=new T.Mesh(new T.PlaneGeometry(flrW,flrD),shedMat)
 shedPlane.rotation.x=-Math.PI/2;shedPlane.position.y=.003;sc.add(shedPlane)
@@ -152,12 +151,12 @@ function mkWoodTex(base,rng,w){
   t.repeat.set(2,1);t.anisotropy=4
   return t
 }
-const wdTex=mkWoodTex(160,35)
-const wlTex=mkWoodTex(200,30)
-const wkTex=mkWoodTex(140,30,64)
-const wd=new T.MeshPhysicalMaterial({map:wdTex,color:0xf0e4d0,roughness:.85,metalness:0,clearcoat:.06,clearcoatRoughness:.4})
-const wl=new T.MeshPhysicalMaterial({map:wlTex,color:0xf8f0e0,roughness:.78,metalness:0,clearcoat:.05,clearcoatRoughness:.5})
-const wk=new T.MeshPhysicalMaterial({map:wkTex,color:0xe0d4c0,roughness:.9,metalness:0})
+const wdTex=mkWoodTex(90,25)
+const wlTex=mkWoodTex(125,20)
+const wkTex=mkWoodTex(75,20,64)
+const wd=new T.MeshPhysicalMaterial({map:wdTex,color:0xd8c8a0,roughness:.85,metalness:0,clearcoat:.06,clearcoatRoughness:.4})
+const wl=new T.MeshPhysicalMaterial({map:wlTex,color:0xe4d8b8,roughness:.78,metalness:0,clearcoat:.05,clearcoatRoughness:.5})
+const wk=new T.MeshPhysicalMaterial({map:wkTex,color:0xb8a488,roughness:.9,metalness:0})
 
 // ── BEAM HELPER ──
 const _v=new T.Vector3()
@@ -445,8 +444,8 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
 
   const pmrem=new T.PMREMGenerator(rdr)
   const envMap=pmrem.fromEquirectangular(hdr).texture
-  sc.environment=envMap;sc.background=new T.Color(0x0d0d14)
-  sc.environmentIntensity=2.0
+  sc.environment=envMap;sc.background=envMap
+  sc.environmentIntensity=1.4
   pmrem.dispose()
 
   // ── PREPARE MODELS ──

@@ -62,10 +62,19 @@ for(let i=0;i<200;i++){
   fc.fillStyle=`rgba(20,20,24,${Math.random()*.08})`
   fc.fillRect(x,y,Math.random()*60+20,Math.random()*60+20)
 }
+// tile lines
+fc.strokeStyle='rgba(40,40,50,.15)';fc.lineWidth=1
+for(let i=0;i<16;i++){fc.beginPath();fc.moveTo(i*64,0);fc.lineTo(i*64,768);fc.stroke()}
+for(let i=0;i<12;i++){fc.beginPath();fc.moveTo(0,i*64);fc.lineTo(1024,i*64);fc.stroke()}
+// section labels
+fc.font='bold 36px monospace';fc.textAlign='center';fc.textBaseline='middle'
+fc.fillStyle='rgba(60,55,50,.08)';fc.fillText('R.D.F',512,80)
+fc.fillStyle='rgba(50,55,65,.08)';fc.fillText('81 SIGNAL REG',512,340)
+fc.fillStyle='rgba(55,50,45,.08)';fc.fillText('SOUTHERN COMMAND',512,620)
 const fTex=new T.CanvasTexture(fCan)
 fTex.wrapS=fTex.wrapT=T.RepeatWrapping
 fTex.repeat.set(8,6);fTex.anisotropy=8
-const floorMat=new T.MeshPhysicalMaterial({map:fTex,roughness:.92,metalness:0})
+const floorMat=new T.MeshPhysicalMaterial({map:fTex,roughness:.85,metalness:.05,envMapIntensity:.2})
 const flr=new T.Mesh(new T.PlaneGeometry(flrW,flrD),floorMat)
 flr.rotation.x=-Math.PI/2;flr.receiveShadow=true;flr.position.y=-.01;flr.userData.isFloor=true;sc.add(flr)
 
@@ -335,11 +344,12 @@ function drawMap(){
     const pw=mX(r.x+r.w/2)-x,ph=mZ(r.z+r.d/2)-y
     const tot=rd.a1+rd.a2,rem=(rd.a1Rem||0)+(rd.a2Rem||0),missing=tot-rem
     const ratio=rem/tot
-    let col
-    if(missing===0)col='#30b860'
-    else if(missing===tot)col='#ee3333'
-    else if(ratio<.25)col='#e06840'
-    else col='#d0a840'
+    let col, blink
+    if(missing===0){col='#30b860';blink=false}
+    else if(missing===tot){col='#ee3333';blink=true}
+    else if(ratio<.25){col='#e06840';blink=true}
+    else{col='#d0a840';blink=true}
+    if(blink&&Date.now()%600<300)col='#441111'
     mctx.fillStyle='rgba(16,16,26,.85)'
     mctx.strokeStyle=col;mctx.lineWidth=1.5
     mctx.beginPath();mctx.roundRect(x,y,pw,ph,3);mctx.fill();mctx.stroke()
@@ -1171,6 +1181,10 @@ function tick(){
     const missing=(rd.a1-rd.a1Rem)+(rd.a2-rd.a2Rem)
     if(missing>0){
       g.material.opacity=t*3%1>.5?0:1
+      // blink indicator lights for missing guns
+      const blink=t*4%1>.5
+      rd.a1G.forEach(gw=>{if(!rd._rem?.includes(gw)&&gw.userData.indEl){gw.userData.indEl.material.emissiveIntensity=blink?0:4}})
+      rd.a2G.forEach(gw=>{if(!rd._rem?.includes(gw)&&gw.userData.indEl){gw.userData.indEl.material.emissiveIntensity=blink?0:4}})
     }else{g.material.opacity=0}
   })
   if(_walkMode&&cam.position.y<.2)cam.position.y=.2
@@ -1182,7 +1196,7 @@ function tick(){
   rdr.render(sc,cam);ldr.render(sc,cam)
 }
 tick()
-setInterval(()=>{if(sc.children.length)drawMap()},2000)
+setInterval(()=>{if(sc.children.length)drawMap()},600)
 
 addEventListener('resize',()=>{
   cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()

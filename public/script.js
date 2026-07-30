@@ -102,7 +102,7 @@ fl1.shadow.camera.left=-12;fl1.shadow.camera.right=12
 fl1.shadow.camera.top=10;fl1.shadow.camera.bottom=-4
 fl1.shadow.bias=-.0005;fl1.shadow.normalBias=.01
 sc.add(fl1)
-const rimL=new T.DirectionalLight(0xffeecc,3);rimL.position.set(5,8,8);sc.add(rimL)
+const rimL=new T.DirectionalLight(0xffeedd,6);rimL.position.set(6,10,10);sc.add(rimL)
 const bncL=new T.DirectionalLight(0x887a6a,.6);bncL.position.set(0,-2,0);sc.add(bncL)
 for(let x=-1;x<=1;x+=2)
   for(let z=-1;z<=1;z+=2){
@@ -444,8 +444,8 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
 
   const pmrem=new T.PMREMGenerator(rdr)
   const envMap=pmrem.fromEquirectangular(hdr).texture
-  sc.environment=envMap;sc.background=bgCol
-  sc.environmentIntensity=1.8
+  sc.environment=envMap;sc.background=envMap
+  sc.environmentIntensity=1.4
   pmrem.dispose()
 
   // ── PREPARE MODELS ──

@@ -14,7 +14,7 @@ cam.position.set(0,3.2,4.5)
 const rdr=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})
 rdr.setSize(innerWidth,innerHeight)
 rdr.toneMapping=T.ACESFilmicToneMapping
-rdr.toneMappingExposure=2.0
+rdr.toneMappingExposure=1.6
 rdr.shadowMap.enabled=true
 rdr.shadowMap.type=T.PCFSoftShadowMap
 rdr.outputColorSpace=T.SRGBColorSpace
@@ -51,15 +51,15 @@ function mZ(z){return(z+8.5)/9*MH}
 const flrW=40,flrD=24
 const fCan=document.createElement('canvas');fCan.width=1024;fCan.height=768
 const fc=fCan.getContext('2d')
-fc.fillStyle='#5a5a5a';fc.fillRect(0,0,1024,768)
+fc.fillStyle='#2a2a2e';fc.fillRect(0,0,1024,768)
 for(let i=0;i<60000;i++){
   const x=Math.random()*1024,y=Math.random()*768
-  const v=70+Math.random()*40
+  const v=30+Math.random()*25
   fc.fillStyle=`rgba(${v},${v},${v},.35)`;fc.fillRect(x,y,Math.random()*3+1,Math.random()*3+1)
 }
 for(let i=0;i<200;i++){
   const x=Math.random()*1024,y=Math.random()*768
-  fc.fillStyle=`rgba(40,40,45,${Math.random()*.08})`
+  fc.fillStyle=`rgba(20,20,24,${Math.random()*.08})`
   fc.fillRect(x,y,Math.random()*60+20,Math.random()*60+20)
 }
 const fTex=new T.CanvasTexture(fCan)
@@ -70,7 +70,7 @@ const flr=new T.Mesh(new T.PlaneGeometry(flrW,flrD),floorMat)
 flr.rotation.x=-Math.PI/2;flr.receiveShadow=true;flr.position.y=-.01;flr.userData.isFloor=true;sc.add(flr)
 
 // ── RAISED PLATFORMS (elevation) ──
-const platMat=new T.MeshPhysicalMaterial({color:'#4a4a4a',roughness:.9,metalness:0})
+const platMat=new T.MeshPhysicalMaterial({color:'#2a2a2e',roughness:.9,metalness:0})
 const rowsZ=[0,-3.5,-7.5]
 rowsZ.forEach(z=>{
   const pw=10.5,pd=2.4,ph=.08
@@ -79,7 +79,7 @@ rowsZ.forEach(z=>{
   plat.receiveShadow=true;plat.castShadow=true
   sc.add(plat)
   // beveled edge
-  const edge=new T.Mesh(new T.BoxGeometry(pw+.02,.01,pd+.02),new T.MeshPhysicalMaterial({color:'#3a3a3a',roughness:.95,metalness:0}))
+  const edge=new T.Mesh(new T.BoxGeometry(pw+.02,.01,pd+.02),new T.MeshPhysicalMaterial({color:'#1e1e22',roughness:.95,metalness:0}))
   edge.position.set(0,.01,z)
   sc.add(edge)
 })
@@ -129,8 +129,8 @@ for(let i=0;i<6;i++){
 }
 // ── GROUND REFLECTION (envMap sheen on floor) ──
 const shedMat=new T.MeshPhysicalMaterial({
-  color:'#2a2a36',roughness:.35,metalness:.85,transparent:true,opacity:.06,
-  envMapIntensity:.4,depthWrite:false
+  color:'#18181c',roughness:.35,metalness:.85,transparent:true,opacity:.04,
+  envMapIntensity:.3,depthWrite:false
 })
 const shedPlane=new T.Mesh(new T.PlaneGeometry(flrW,flrD),shedMat)
 shedPlane.rotation.x=-Math.PI/2;shedPlane.position.y=.003;sc.add(shedPlane)

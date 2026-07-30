@@ -6,7 +6,7 @@ import{GLTFLoader}from'three/addons/loaders/GLTFLoader.js'
 import{FBXLoader}from'three/addons/loaders/FBXLoader.js'
 
 const sc=new T.Scene()
-const bgCol=new T.Color(0x121218)
+const bgCol=new T.Color(0x2a2a38)
 
 const cam=new T.PerspectiveCamera(50,innerWidth/innerHeight,0.1,120)
 cam.position.set(0,3.2,4.5)
@@ -103,8 +103,9 @@ fl1.shadow.camera.top=10;fl1.shadow.camera.bottom=-4
 fl1.shadow.bias=-.0005;fl1.shadow.normalBias=.01
 sc.add(fl1)
 const rimL=new T.DirectionalLight(0xffeecc,3);rimL.position.set(5,8,8);sc.add(rimL)
-const blimL=new T.DirectionalLight(0xffddbb,5);blimL.position.set(-2,4,-4);sc.add(blimL)
-const bncL=new T.DirectionalLight(0x887a6a,.6);bncL.position.set(0,-2,0);sc.add(bncL)
+const blimL=new T.DirectionalLight(0xffe8d0,6);blimL.position.set(0,3,-5);sc.add(blimL)
+const flimL=new T.DirectionalLight(0xccd8ff,.8);flimL.position.set(0,1.5,5);sc.add(flimL)
+const bncL=new T.DirectionalLight(0xa09080,1.2);bncL.position.set(0,-2,0);sc.add(bncL)
 for(let x=-1;x<=1;x+=2)
   for(let z=-1;z<=1;z+=2){
     const wl=new T.DirectionalLight(0xfff8f0,.5);wl.position.set(x*5,3,z*3);sc.add(wl)

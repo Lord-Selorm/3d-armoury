@@ -511,7 +511,8 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
   }
 
   const m16t=prep(m16g.scene)
-  const ak47t=prep(ak47g.scene)
+  const yawWrap=(t,a)=>{const g=new T.Group();g.add(t);g.rotation.y=a;return g}
+  const ak47t=yawWrap(prep(ak47g.scene),Math.PI)
 
   function makeShortButt(group){
     let my=Infinity,My=-Infinity

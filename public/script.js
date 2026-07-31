@@ -555,32 +555,6 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
     return tex
   }
   const silMat=new T.MeshBasicMaterial({transparent:true,depthWrite:false,side:T.DoubleSide})
-  // realistic per-gun color palettes: [luminance threshold, hex color]
-  const gunPalettes={
-    m16:[[.12,'#3a3a3e'],[.3,'#56565a'],[1,'#141416']],
-    ak47:[[.12,'#1c1c20'],[.35,'#4a3625'],[1,'#6b4f34']],
-    uzi:[[.12,'#141416'],[.4,'#3a3a3e'],[1,'#1c1c1e']],
-    sr25:[[.12,'#17171b'],[.4,'#3e3e42'],[1,'#6b5a3e']],
-    negev:[[.12,'#1a1a1e'],[.4,'#404044'],[1,'#6e5a3a']],
-    m60:[[.12,'#20221c'],[.4,'#3a3c38'],[1,'#4d4f40']],
-    mg42:[[.12,'#2e2e34'],[.4,'#46464c'],[1,'#5f4428']],
-    c90:[[.12,'#34372d'],[.4,'#4d5143'],[1,'#565a4a']],
-    rpg:[[.12,'#35382e'],[.4,'#45493c'],[1,'#5c4426']],
-    m4a1:[[.12,'#151517'],[.4,'#3c3c40'],[1,'#67573d']],
-    g3:[[.12,'#2a2a2e'],[.4,'#414146'],[1,'#553d24']]
-  }
-  function applyRealColors(mt,gunType){
-    const pal=gunPalettes[gunType]||gunPalettes.m16
-    const l=.2126*mt.color.r+.7152*mt.color.g+.0722*mt.color.b
-    let col
-    for(let i=0;i<pal.length;i++){if(l<pal[i][0]){col=pal[i][1];break}}
-    if(!col)col=pal[pal.length-1][1]
-    const v=.92+Math.random()*.16
-    const base=new T.Color(col);base.r*=v;base.g*=v;base.b*=v
-    mt.color.copy(base)
-    mt.emissive=new T.Color(0x080604)
-    mt.emissiveIntensity=.12
-  }
   function placeGuns(rack,template,n,side,slant,rackW,tint,offset=0,total=n,gunType){
     const aW=rackW-AB*2
     const H=2.0,D=.62
@@ -608,12 +582,13 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
       clone.traverse(c=>{
         if(c.isMesh&&c.material){
           const m=Array.isArray(c.material)?c.material:[c.material]
+          const v=.94+Math.random()*.12
           m.forEach(mt=>{
-            if(mt.color)applyRealColors(mt,gunType)
-            if(mt.emissive)mt.emissiveIntensity=Math.min(mt.emissiveIntensity||0,.05)
-            mt.metalness=Math.max(mt.metalness??0,.35)
-            mt.roughness=Math.min((mt.roughness??.6)*.95,.9)
-            mt.envMapIntensity=Math.max(mt.envMapIntensity??1,1.3)
+            if(mt.color){
+              const cc=mt.color.clone();cc.r*=v;cc.g*=v;cc.b*=v;mt.color.copy(cc)
+            }
+            if(mt.emissive)mt.emissiveIntensity=Math.min(mt.emissiveIntensity||0,.08)
+            mt.roughness=Math.min((mt.roughness??.6)*1.05,1)
           })
         }
       })

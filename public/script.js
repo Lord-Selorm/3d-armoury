@@ -45,7 +45,7 @@ function resizeMap(){
 }
 resizeMap()
 function mX(x){return(x+10)/20*MW}
-function mZ(z){return(z+8.5)/9*MH}
+function mZ(z){return(z+9.5)/11*MH}
 
 // ── FLOOR (concrete texture) ──
 const flrW=40,flrD=24
@@ -82,7 +82,7 @@ flr.rotation.x=-Math.PI/2;flr.receiveShadow=true;flr.position.y=-.01;flr.userDat
 const platMat=new T.MeshPhysicalMaterial({color:'#3a362c',roughness:.9,metalness:0})
 const rowsZ=[0,-3.5,-7.5]
 rowsZ.forEach(z=>{
-  const pw=10.5,pd=2.4,ph=.08
+  const pw=10.5,pd=3.0,ph=.08
   const plat=new T.Mesh(new T.BoxGeometry(pw,ph,pd),platMat)
   plat.position.set(0,ph/2,z)
   plat.receiveShadow=true;plat.castShadow=true
@@ -361,24 +361,24 @@ function drawMap(){
     mctx.fillStyle='rgba(16,16,26,.85)'
     mctx.strokeStyle=col;mctx.lineWidth=1.5
     mctx.beginPath();mctx.roundRect(x,y,pw,ph,3);mctx.fill();mctx.stroke()
-    const cx=mX(r.x)
     mctx.strokeStyle='rgba(100,90,80,.3)';mctx.lineWidth=.5
-    mctx.beginPath();mctx.moveTo(cx,y+2);mctx.lineTo(cx,y+ph-2);mctx.stroke()
+    mctx.beginPath();mctx.moveTo(mX(r.x),y+2);mctx.lineTo(mX(r.x),y+ph-2);mctx.stroke()
     mctx.fillStyle=col+'55'
-    mctx.font='6px monospace';mctx.textAlign='center';mctx.textBaseline='middle'
-    mctx.fillText(rd.rackId,x+pw/2,y-5)
-    const maxN=Math.max(rd.a1,rd.a2),slotW=pw/maxN
+    mctx.font='6px monospace';mctx.textAlign='right';mctx.textBaseline='middle'
+    mctx.fillText(rd.rackId,x-2,y+ph/2)
+    const maxN=Math.max(rd.a1,rd.a2),slotH=ph/maxN
+    const ax=mX(r.x-.29),bx=mX(r.x+.29)
     for(let s=0;s<rd.a1;s++){
-      const dx=x+slotW*(s+.5),dy=y+ph*.3
+      const dy=y+slotH*(s+.5)
       const co=rd._rem?.some(g=>g.userData.side==='A1'&&g.userData.slot===s)
       mctx.fillStyle=co?'#cc3333':'#44cc66'
-      mctx.beginPath();mctx.arc(dx,dy,1.3,0,Math.PI*2);mctx.fill()
+      mctx.beginPath();mctx.arc(ax,dy,1.3,0,Math.PI*2);mctx.fill()
     }
     for(let s=0;s<rd.a2;s++){
-      const dx=x+slotW*(s+.5),dy=y+ph*.7
+      const dy=y+slotH*(s+.5)
       const co=rd._rem?.some(g=>g.userData.side==='A2'&&g.userData.slot===s)
       mctx.fillStyle=co?'#cc3333':'#44cc66'
-      mctx.beginPath();mctx.arc(dx,dy,1.3,0,Math.PI*2);mctx.fill()
+      mctx.beginPath();mctx.arc(bx,dy,1.3,0,Math.PI*2);mctx.fill()
     }
   })
 }
@@ -667,6 +667,7 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
       const maxN=Math.max(Math.max(r.a1,1),Math.max(r.a2,1))
       const rackW=maxN*SLOT+AB*2
       const rack=mkRack(r.a1,r.a2)
+      rack.rotation.y=Math.PI/2
       rack.position.set(rx+rackW/2,.08,rz)
       sc.add(rack)
 
@@ -684,14 +685,14 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
       const lbl=mkLabel(rackId,'label-rack','#e8d8c0')
       lbl.position.set(rx+rackW/2,2.5,rz);sc.add(lbl)
       rack.userData.labelEl=lbl.element
-      const labZoff=.3
+      const labZoff=.45
       if(r.a1){
         const a1l=mkLabel('A1','label-rack','#e0d0b8')
-        a1l.position.set(rx+.1,1.0,rz-labZoff);sc.add(a1l)
+        a1l.position.set(rx+rackW/2-labZoff,1.0,rz);sc.add(a1l)
       }
       if(r.a2){
         const a2l=mkLabel('A2','label-rack','#e0d0b8')
-        a2l.position.set(rx+.1,1.0,rz+labZoff);sc.add(a2l)
+        a2l.position.set(rx+rackW/2+labZoff,1.0,rz);sc.add(a2l)
       }
 
       const getModel=(g)=>g==='ak47'?ak47t:g==='m16s'?m16sbt:g==='cq'?m4a1t:g==='g3'?g3t:g==='uzi'?uzit:g==='sr25'?sr25t:g==='negev'?negevt:g==='m60'?m60t:g==='mg42'?mg42t:g==='c90'?c90t:g==='rpg'?rpgt:m16t
@@ -720,7 +721,7 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
       rack.add(gBar)
       rack.userData.glowEl=gBar
 
-      _mapRacks.push({userData:rack.userData,x:rx+rackW/2,z:rz,w:rackW,d:.62})
+      _mapRacks.push({userData:rack.userData,x:rx+rackW/2,z:rz,w:.62,d:rackW})
 
       rx+=rackW+ROW_GAP
     })

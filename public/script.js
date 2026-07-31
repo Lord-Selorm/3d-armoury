@@ -685,16 +685,6 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
       const lbl=mkLabel(rackId,'label-rack','#e8d8c0')
       lbl.position.set(rx+rackW/2,2.5,rz);sc.add(lbl)
       rack.userData.labelEl=lbl.element
-      const labZoff=.45
-      if(r.a1){
-        const a1l=mkLabel('A1','label-rack','#e0d0b8')
-        a1l.position.set(rx+rackW/2-labZoff,1.0,rz);sc.add(a1l)
-      }
-      if(r.a2){
-        const a2l=mkLabel('A2','label-rack','#e0d0b8')
-        a2l.position.set(rx+rackW/2+labZoff,1.0,rz);sc.add(a2l)
-      }
-
       const getModel=(g)=>g==='ak47'?ak47t:g==='m16s'?m16sbt:g==='cq'?m4a1t:g==='g3'?g3t:g==='uzi'?uzit:g==='sr25'?sr25t:g==='negev'?negevt:g==='m60'?m60t:g==='mg42'?mg42t:g==='c90'?c90t:g==='rpg'?rpgt:m16t
       const slant=.6
       const placeSide=(count,modelArr,side)=>{
@@ -779,6 +769,7 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
 
   // ── DONE ──
   document.getElementById('load').style.display='none'
+  sc.children.forEach(c=>{if(c.userData?.isRack)updateRackLabel(c.userData)})
   loadState()
 }).catch(e=>{
   document.getElementById('load').innerHTML='<span style="color:#c04040">ERROR: '+(e.message||e)+'</span>'
@@ -921,8 +912,8 @@ function animateIn(gunW,rack,side){
 }
 function updateRackLabel(rd){
   const a1=rd.a1,a2=rd.a2,a1R=rd.a1Rem,a2R=rd.a2Rem
-  rd.labelEl.textContent=rd.rackId+(a2?`  A1:${a1R}/${a1} A2:${a2R}/${a2}`:`  A1:${a1R}/${a1}`)
   const missing=(a1-a1R)+(a2-a2R)
+  rd.labelEl.innerHTML=rd.rackId+' <span class="rc'+(missing>0?' miss':'')+'">'+(a1R+a2R)+'/'+(a1+a2)+'</span>'
   if(rd.glowEl){
     if(missing>0){
       rd.glowEl.material.opacity=1;rd.glowEl.material.color.set('#ff0000')

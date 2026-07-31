@@ -6,6 +6,8 @@ body{overflow:hidden;background:#08080c;font-family:'Segoe UI',Arial,sans-serif}
 .label-2d{pointer-events:none;font-family:'Segoe UI',Arial,sans-serif;text-shadow:0 0 4px rgba(0,0,0,.9),0 0 1px #000;text-align:center;user-select:none;-webkit-font-smoothing:antialiased}
 .label-section{color:#f0e4cc;font-size:28px;font-weight:700;letter-spacing:2.5px;background:rgba(8,8,12,.85);padding:5px 22px;border:1.5px solid #7a6a5a;border-radius:4px}
 .label-rack{color:#e8d8c0;font-size:16px;font-weight:700;background:rgba(8,8,12,.85);padding:3px 10px;border-radius:3px;border:1px solid #5a4a3a}
+.label-rack .rc{opacity:.72}
+.label-rack .rc.miss{opacity:1;color:#ff8c5a}
 #toast{position:fixed;bottom:44px;left:50%;transform:translateX(-50%);z-index:10;pointer-events:none;text-align:center;background:rgba(8,8,12,.85);color:#e8d8c0;padding:6px 18px;border-radius:4px;font:15px/1.4 'Segoe UI',Arial,sans-serif;border:1px solid #5a4a3a;opacity:0;transition:opacity .4s;-webkit-font-smoothing:antialiased}
 #help{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(4,4,8,.85);cursor:pointer}
 #help in{background:#12121e;color:#d8cbb8;max-width:460px;width:90%;padding:24px 30px;border-radius:8px;border:1.5px solid #5a4a3a;font:13px/1.7 'Segoe UI',Arial,sans-serif;cursor:default;pointer-events:auto}

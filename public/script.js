@@ -131,10 +131,17 @@ for(let i=0;i<8;i++){
   l.position.set(px,4.2,pz)
   l.userData={baseInt:l.intensity,phase:Math.random()*100,spd:.3+Math.random()*.5}
   sc.add(l),flickerLights.push(l)
-  const bMat=new T.MeshPhysicalMaterial({color:'#ffe8d0',emissive:'#ffdd88',emissiveIntensity:2,roughness:.1,metalness:0,transparent:true,opacity:.9})
-  const bulb=new T.Mesh(new T.SphereGeometry(.08,12,10),bMat)
+  const bMat=new T.MeshBasicMaterial({color:'#ffddaa'})
+  const bulb=new T.Mesh(new T.SphereGeometry(.09,12,10),bMat)
   bulb.position.set(px,4.2,pz);sc.add(bulb)
-  const hMat=new T.MeshPhysicalMaterial({color:'#3a3a3a',roughness:.6,metalness:.7})
+  const gCan=document.createElement('canvas');gCan.width=64;gCan.height=64
+  const gcx=gCan.getContext('2d')
+  const grd=gcx.createRadialGradient(32,32,2,32,32,30)
+  grd.addColorStop(0,'rgba(255,220,160,1)');grd.addColorStop(1,'rgba(255,220,160,0)')
+  gcx.fillStyle=grd;gcx.fillRect(0,0,64,64)
+  const glow=new T.Sprite(new T.SpriteMaterial({map:new T.CanvasTexture(gCan),transparent:true,blending:T.AdditiveBlending,depthWrite:false}))
+  glow.position.set(px,4.2,pz);glow.scale.set(.5,.5,1);sc.add(glow)
+  const hMat=new T.MeshPhysicalMaterial({color:'#2b2622',roughness:.6,metalness:.4,envMapIntensity:.4})
   const housing=new T.Mesh(new T.CylinderGeometry(.15,.2,.06,12),hMat)
   housing.position.set(px,4.26,pz);sc.add(housing)
 }

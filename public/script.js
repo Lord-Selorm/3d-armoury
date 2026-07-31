@@ -626,7 +626,7 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
       const w=new T.Group()
       w.add(clone)
       w.position.set(x,y,z)
-      w.rotation.x=side*slant
+      w.rotation.set(side*slant,Math.PI/2,0)
       w.userData={isGun:true,side:sd,slot:i,gunType:gunType||''}
       const iMat=new T.MeshBasicMaterial({color:'#22ee44',transparent:true})
       const ind=new T.Mesh(iGeo,iMat)

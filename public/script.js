@@ -447,7 +447,7 @@ function applyTex(group,texDir,names){
   })
 }
 
-const loadAll=Promise.all([loadGLB('models/m16.glb'),loadGLB('models/ak47.glb'),loadGLB('models/uzi.glb'),loadGLB('models/sr25.glb'),loadGLB('models/negev.glb'),loadGLB('models/m60.glb'),loadGLB('models/mg42.glb'),loadGLB('models/c90.glb'),loadGLB('models/rpg7.glb'),loadFBX('models/m4a1_oga/M4A1.fbx').then(g=>{applyTex(g,'models/m4a1_oga/',{map:'M4A1_Base_Color.png',normalMap:'M4A1_Normal.png',metalnessMap:'M4A1_Metallic.png',roughnessMap:'M4A1_Roughness.png'});return g}),loadFBX('models/g3_model/Gun.fbx').then(g=>{applyTex(g,'models/g3_model/',{map:'Texture_Base_Color.png',normalMap:'Texture_Normal.png',metalnessMap:'Texture_Metallic.png',roughnessMap:'Texture_Roughness.png',aoMap:'Texture_Mixed_AO.png'});g.traverse(c=>{if(c.isMesh&&c.material){const m=Array.isArray(c.material)?c.material:[c.material];m.forEach(m=>{m.color=new T.Color(0x2e2e2e);m.roughness=.5;m.metalness=.4;m.envMapIntensity=1.2})}});return g}),loadHDR('models/warehouse.hdr')])
+const loadAll=Promise.all([loadGLB('models/m16.glb'),loadGLB('models/ak47.glb'),loadGLB('models/uzi.glb'),loadGLB('models/sr25.glb'),loadGLB('models/negev.glb'),loadGLB('models/m60.glb'),loadGLB('models/mg42.glb'),loadGLB('models/c90.glb'),loadGLB('models/rpg7.glb'),loadFBX('models/m4a1_oga/M4A1.fbx').then(g=>{applyTex(g,'models/m4a1_oga/',{map:'M4A1_Base_Color.png',normalMap:'M4A1_Normal.png',metalnessMap:'M4A1_Metallic.png',roughnessMap:'M4A1_Roughness.png'});return g}),loadFBX('models/g3_model/Gun.fbx').then(g=>{applyTex(g,'models/g3_model/',{map:'Texture_Base_Color.png',normalMap:'Texture_Normal.png',metalnessMap:'Texture_Metallic.png',roughnessMap:'Texture_Roughness.png',aoMap:'Texture_Mixed_AO.png'});g.traverse(c=>{if(c.isMesh&&c.material){const m=Array.isArray(c.material)?c.material:[c.material];m.forEach(m=>{m.color=new T.Color(0x222222)})}});return g}),loadHDR('models/warehouse.hdr')])
 const loadTimeout=new Promise(res=>setTimeout(()=>res('TIMEOUT'),15000))
 
 Promise.race([loadAll,loadTimeout]).then(v=>{
@@ -582,14 +582,7 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
       clone.traverse(c=>{
         if(c.isMesh&&c.material){
           const m=Array.isArray(c.material)?c.material:[c.material]
-          const v=.94+Math.random()*.12
-          m.forEach(mt=>{
-            if(mt.color){
-              const cc=mt.color.clone();cc.r*=v;cc.g*=v;cc.b*=v;mt.color.copy(cc)
-            }
-            if(mt.emissive)mt.emissiveIntensity=Math.min(mt.emissiveIntensity||0,.08)
-            mt.roughness=Math.min((mt.roughness??.6)*1.05,1)
-          })
+          m.forEach(mt=>{mt.emissive=new T.Color(0x554433);mt.emissiveIntensity=.35})
         }
       })
       const w=new T.Group()

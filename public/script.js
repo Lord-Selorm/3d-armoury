@@ -6,7 +6,7 @@ import{GLTFLoader}from'three/addons/loaders/GLTFLoader.js'
 import{FBXLoader}from'three/addons/loaders/FBXLoader.js'
 
 const sc=new T.Scene()
-const bgCol=new T.Color(0x2a2a38)
+const bgCol=new T.Color(0x1e1913)
 
 const cam=new T.PerspectiveCamera(50,innerWidth/innerHeight,0.1,120)
 cam.position.set(0,3.2,4.5)
@@ -14,7 +14,7 @@ cam.position.set(0,3.2,4.5)
 const rdr=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})
 rdr.setSize(innerWidth,innerHeight)
 rdr.toneMapping=T.ACESFilmicToneMapping
-rdr.toneMappingExposure=1.0
+rdr.toneMappingExposure=1.15
 rdr.shadowMap.enabled=true
 rdr.shadowMap.type=T.PCFSoftShadowMap
 rdr.outputColorSpace=T.SRGBColorSpace
@@ -51,7 +51,7 @@ function mZ(z){return(z+8.5)/9*MH}
 const flrW=40,flrD=24
 const fCan=document.createElement('canvas');fCan.width=1024;fCan.height=768
 const fc=fCan.getContext('2d')
-fc.fillStyle='#2a2a2e';fc.fillRect(0,0,1024,768)
+fc.fillStyle='#3a352c';fc.fillRect(0,0,1024,768)
 for(let i=0;i<60000;i++){
   const x=Math.random()*1024,y=Math.random()*768
   const v=30+Math.random()*25
@@ -59,7 +59,7 @@ for(let i=0;i<60000;i++){
 }
 for(let i=0;i<200;i++){
   const x=Math.random()*1024,y=Math.random()*768
-  fc.fillStyle=`rgba(20,20,24,${Math.random()*.08})`
+  fc.fillStyle=`rgba(25,20,14,${Math.random()*.08})`
   fc.fillRect(x,y,Math.random()*60+20,Math.random()*60+20)
 }
 // tile lines
@@ -79,7 +79,7 @@ const flr=new T.Mesh(new T.PlaneGeometry(flrW,flrD),floorMat)
 flr.rotation.x=-Math.PI/2;flr.receiveShadow=true;flr.position.y=-.01;flr.userData.isFloor=true;sc.add(flr)
 
 // ── RAISED PLATFORMS (elevation) ──
-const platMat=new T.MeshPhysicalMaterial({color:'#2a2a2e',roughness:.9,metalness:0})
+const platMat=new T.MeshPhysicalMaterial({color:'#3a362c',roughness:.9,metalness:0})
 const rowsZ=[0,-3.5,-7.5]
 rowsZ.forEach(z=>{
   const pw=10.5,pd=2.4,ph=.08
@@ -88,14 +88,14 @@ rowsZ.forEach(z=>{
   plat.receiveShadow=true;plat.castShadow=true
   sc.add(plat)
   // beveled edge
-  const edge=new T.Mesh(new T.BoxGeometry(pw+.02,.01,pd+.02),new T.MeshPhysicalMaterial({color:'#3a3a3a',roughness:.95,metalness:0}))
+  const edge=new T.Mesh(new T.BoxGeometry(pw+.02,.01,pd+.02),new T.MeshPhysicalMaterial({color:'#4a443a',roughness:.95,metalness:0}))
   edge.position.set(0,.01,z)
   sc.add(edge)
 })
 
 // ── LIGHTING ──
-const ambient=new T.AmbientLight(0xfff5ee,.3);sc.add(ambient)
-const kl=new T.DirectionalLight(0xfff0e0,8)
+const ambient=new T.AmbientLight(0xfff0e0,.45);sc.add(ambient)
+const kl=new T.DirectionalLight(0xffe8cc,7)
 kl.position.set(10,14,6);kl.castShadow=true
 kl.shadow.mapSize.set(4096,4096)
 kl.shadow.camera.near=.5;kl.shadow.camera.far=24
@@ -103,7 +103,7 @@ kl.shadow.camera.left=-16;kl.shadow.camera.right=16
 kl.shadow.camera.top=14;kl.shadow.camera.bottom=-6
 kl.shadow.bias=-.0008;kl.shadow.normalBias=.02
 sc.add(kl)
-const fl1=new T.DirectionalLight(0xdde0ff,3)
+const fl1=new T.DirectionalLight(0xe8dcf0,2)
 fl1.position.set(-8,10,-6);fl1.castShadow=true
 fl1.shadow.mapSize.set(2048,2048)
 fl1.shadow.camera.near=.5;fl1.shadow.camera.far=20
@@ -111,11 +111,11 @@ fl1.shadow.camera.left=-12;fl1.shadow.camera.right=12
 fl1.shadow.camera.top=10;fl1.shadow.camera.bottom=-4
 fl1.shadow.bias=-.0005;fl1.shadow.normalBias=.01
 sc.add(fl1)
-const rimL=new T.DirectionalLight(0xffeecc,3);rimL.position.set(5,8,8);sc.add(rimL)
-const blimL=new T.DirectionalLight(0xffe8d0,6);blimL.position.set(0,3,-5);sc.add(blimL)
-const scl=new T.DirectionalLight(0xffeedd,4);scl.position.set(0,5,-8);sc.add(scl)
-const flimL=new T.DirectionalLight(0xccd8ff,.8);flimL.position.set(0,1.5,5);sc.add(flimL)
-const bncL=new T.DirectionalLight(0xa09080,1.2);bncL.position.set(0,-2,0);sc.add(bncL)
+const rimL=new T.DirectionalLight(0xffe0b8,2.5);rimL.position.set(5,8,8);sc.add(rimL)
+const blimL=new T.DirectionalLight(0xffd8a8,4);blimL.position.set(0,3,-5);sc.add(blimL)
+const scl=new T.DirectionalLight(0xffdcb0,3);scl.position.set(0,5,-8);sc.add(scl)
+const flimL=new T.DirectionalLight(0xf0e0f8,.6);flimL.position.set(0,1.5,5);sc.add(flimL)
+const bncL=new T.DirectionalLight(0xa09080,1);bncL.position.set(0,-2,0);sc.add(bncL)
 for(let x=-1;x<=1;x+=2)
   for(let z=-1;z<=1;z+=2){
     const wl=new T.DirectionalLight(0xfff8f0,.5);wl.position.set(x*5,3,z*3);sc.add(wl)
@@ -140,7 +140,7 @@ for(let i=0;i<8;i++){
 }
 // ── GROUND REFLECTION (envMap sheen on floor) ──
 const shedMat=new T.MeshPhysicalMaterial({
-  color:'#18181c',roughness:.35,metalness:.85,transparent:true,opacity:.03,
+  color:'#221d16',roughness:.35,metalness:.85,transparent:true,opacity:.03,
   envMapIntensity:.2,depthWrite:false
 })
 const shedPlane=new T.Mesh(new T.PlaneGeometry(flrW,flrD),shedMat)
@@ -457,8 +457,8 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
 
   const pmrem=new T.PMREMGenerator(rdr)
   const envMap=pmrem.fromEquirectangular(hdr).texture
-  sc.environment=envMap;sc.background=envMap
-  sc.environmentIntensity=1.4
+  sc.environment=envMap;sc.background=bgCol
+  sc.environmentIntensity=1.0
   pmrem.dispose()
 
   // ── PREPARE MODELS ──

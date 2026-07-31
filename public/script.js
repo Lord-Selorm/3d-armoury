@@ -628,12 +628,12 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
       w.position.set(x,y,z)
       w.rotation.x=side*slant
       w.userData={isGun:true,side:sd,slot:i,gunType:gunType||''}
-      const iMat=new T.MeshStandardMaterial({color:'#22ee44',emissive:'#33ff55',emissiveIntensity:3,roughness:.1,metalness:0})
+      const iMat=new T.MeshBasicMaterial({color:'#22ee44',transparent:true})
       const ind=new T.Mesh(iGeo,iMat)
       ind.position.set(x,y+.4,z-side*.15)
       ind.userData={isInd:true,gunW:w}
       rack.add(ind)
-      const iGlow=new T.Sprite(new T.SpriteMaterial({map:iGlowTex,transparent:true,blending:T.AdditiveBlending,depthWrite:false,opacity:.7}))
+      const iGlow=new T.Sprite(new T.SpriteMaterial({map:iGlowTex,transparent:true,blending:T.AdditiveBlending,depthWrite:false,opacity:.35}))
       iGlow.position.set(x,y+.4,z-side*.15);iGlow.scale.set(.2,.2,1)
       rack.add(iGlow)
       w.userData.indEl=ind
@@ -855,7 +855,7 @@ function checkoutGun(gunW){
   gunW.userData._oscl=gunW.scale.clone()
   const sz=gunW.position.z,ez=sz+(side==='A1'?-.3:.3)
   _anims.push({gw:gunW,pSz:sz,pEz:ez,sSz:1,sEz:.4,t:0})
-  if(gunW.userData.indEl){const m=gunW.userData.indEl.material;m.color.set('#ff2222');m.emissive.set('#ff2222');m.emissiveIntensity=4}
+  if(gunW.userData.indEl){const m=gunW.userData.indEl.material;m.color.set('#ff3b30');m.opacity=1;m.visible=true}
   if(gunW.userData.glowEl){gunW.userData.glowEl.material.color.set('#ff4444')}
   updateRackLabel(rd)
   if(!_loadingState){
@@ -876,7 +876,7 @@ function restoreGun(rack){
   const side=gunW.userData.side
   const k=side.toLowerCase()+'Rem'
   rd[k]++;animateIn(gunW,rack,side)
-  if(gunW.userData.indEl){const m=gunW.userData.indEl.material;m.color.set('#22ee44');m.emissive.set('#33ff55');m.emissiveIntensity=3}
+  if(gunW.userData.indEl){const m=gunW.userData.indEl.material;m.color.set('#22ee44');m.opacity=1;m.visible=true}
   if(gunW.userData.glowEl){gunW.userData.glowEl.material.color.set('#44ff66')}
   updateRackLabel(rd)
   if(!_loadingState){
@@ -901,7 +901,7 @@ function restoreSpecificGun(gunW,rack){
   const side=gunW.userData.side
   const k=side.toLowerCase()+'Rem'
   rd[k]++;animateIn(gunW,rack,side)
-  if(gunW.userData.indEl){const m=gunW.userData.indEl.material;m.color.set('#22ee44');m.emissive.set('#33ff55');m.emissiveIntensity=3}
+  if(gunW.userData.indEl){const m=gunW.userData.indEl.material;m.color.set('#22ee44');m.opacity=1;m.visible=true}
   if(gunW.userData.glowEl){gunW.userData.glowEl.material.color.set('#44ff66')}
   updateRackLabel(rd)
   const wp=new T.Vector3();gunW.getWorldPosition(wp);burst(wp,8,'#44ff88')
@@ -1070,13 +1070,13 @@ rdr.domElement.addEventListener('mousemove',e=>{
   if(gun!==_prevHover){
     if(_prevHover&&_prevHover.userData.indEl){
       const m=_prevHover.userData.indEl.material
-      m.emissiveIntensity=_prevHover.userData._origEmInt??3
+      m.color.set(_prevHover.userData._origCol||'#22ee44')
     }
     _prevHover=gun
     if(gun&&gun.userData.indEl){
       const m=gun.userData.indEl.material
-      if(gun.userData._origEmInt==null)gun.userData._origEmInt=m.emissiveIntensity
-      m.emissiveIntensity=5
+      if(gun.userData._origCol==null)gun.userData._origCol='#'+m.color.getHexString()
+      m.color.set('#ffffff')
     }
     rdr.domElement.style.cursor=gun?'pointer':'default'
   }
@@ -1224,8 +1224,8 @@ function tick(){
       g.material.opacity=t*3%1>.5?0:1
       // blink indicator lights for missing guns
       const blink=t*4%1>.5
-      rd.a1G.forEach(gw=>{if(!rd._rem?.includes(gw)&&gw.userData.indEl){gw.userData.indEl.material.emissiveIntensity=blink?0:4}})
-      rd.a2G.forEach(gw=>{if(!rd._rem?.includes(gw)&&gw.userData.indEl){gw.userData.indEl.material.emissiveIntensity=blink?0:4}})
+      rd.a1G.forEach(gw=>{if(!rd._rem?.includes(gw)&&gw.userData.indEl){gw.userData.indEl.material.visible=blink}})
+      rd.a2G.forEach(gw=>{if(!rd._rem?.includes(gw)&&gw.userData.indEl){gw.userData.indEl.material.visible=blink}})
     }else{g.material.opacity=0}
   })
   if(_walkMode&&cam.position.y<.2)cam.position.y=.2

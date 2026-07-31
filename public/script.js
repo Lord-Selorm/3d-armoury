@@ -434,6 +434,30 @@ function loadFBX(u){
   const loader=new FBXLoader()
   return new Promise((res,rej)=>loader.load(u,res,()=>{},rej))
 }
+function makeWarmEnv(){
+  const w=1024,h=512
+  const c=document.createElement('canvas');c.width=w;c.height=h
+  const x=c.getContext('2d')
+  const g=x.createLinearGradient(0,0,0,h)
+  g.addColorStop(0,'#3a2c1c')
+  g.addColorStop(.35,'#4a3826')
+  g.addColorStop(.48,'#5a4430')
+  g.addColorStop(.5,'#3a2c1e')
+  g.addColorStop(.65,'#2c2118')
+  g.addColorStop(1,'#1e1712')
+  x.fillStyle=g;x.fillRect(0,0,w,h)
+  for(let i=0;i<6;i++){
+    const lx=Math.random()*w,ly=20+Math.random()*80,r=40+Math.random()*60
+    const rg=x.createRadialGradient(lx,ly,0,lx,ly,r)
+    rg.addColorStop(0,'rgba(255,220,160,.9)')
+    rg.addColorStop(1,'rgba(255,220,160,0)')
+    x.fillStyle=rg;x.fillRect(lx-r,ly-r,r*2,r*2)
+  }
+  const t=new T.CanvasTexture(c)
+  t.mapping=T.EquirectangularReflectionMapping
+  t.colorSpace=T.SRGBColorSpace
+  return t
+}
 function applyTex(group,texDir,names){
   const tl=new T.TextureLoader()
   const tex={}
@@ -447,7 +471,7 @@ function applyTex(group,texDir,names){
   })
 }
 
-const loadAll=Promise.all([loadGLB('models/m16.glb'),loadGLB('models/ak47.glb'),loadGLB('models/uzi.glb'),loadGLB('models/sr25.glb'),loadGLB('models/negev.glb'),loadGLB('models/m60.glb'),loadGLB('models/mg42.glb'),loadGLB('models/c90.glb'),loadGLB('models/rpg7.glb'),loadFBX('models/m4a1_oga/M4A1.fbx').then(g=>{applyTex(g,'models/m4a1_oga/',{map:'M4A1_Base_Color.png',normalMap:'M4A1_Normal.png',metalnessMap:'M4A1_Metallic.png',roughnessMap:'M4A1_Roughness.png'});return g}),loadFBX('models/g3_model/Gun.fbx').then(g=>{applyTex(g,'models/g3_model/',{map:'Texture_Base_Color.png',normalMap:'Texture_Normal.png',metalnessMap:'Texture_Metallic.png',roughnessMap:'Texture_Roughness.png',aoMap:'Texture_Mixed_AO.png'});g.traverse(c=>{if(c.isMesh&&c.material){const m=Array.isArray(c.material)?c.material:[c.material];m.forEach(m=>{m.color=new T.Color(0x2e2e2e);m.roughness=.5;m.metalness=.4;m.envMapIntensity=1.2})}});return g}),loadHDR('models/warehouse.hdr')])
+const loadAll=Promise.all([loadGLB('models/m16.glb'),loadGLB('models/ak47.glb'),loadGLB('models/uzi.glb'),loadGLB('models/sr25.glb'),loadGLB('models/negev.glb'),loadGLB('models/m60.glb'),loadGLB('models/mg42.glb'),loadGLB('models/c90.glb'),loadGLB('models/rpg7.glb'),loadFBX('models/m4a1_oga/M4A1.fbx').then(g=>{applyTex(g,'models/m4a1_oga/',{map:'M4A1_Base_Color.png',normalMap:'M4A1_Normal.png',metalnessMap:'M4A1_Metallic.png',roughnessMap:'M4A1_Roughness.png'});return g}),loadFBX('models/g3_model/Gun.fbx').then(g=>{applyTex(g,'models/g3_model/',{map:'Texture_Base_Color.png',normalMap:'Texture_Normal.png',metalnessMap:'Texture_Metallic.png',roughnessMap:'Texture_Roughness.png',aoMap:'Texture_Mixed_AO.png'});g.traverse(c=>{if(c.isMesh&&c.material){const m=Array.isArray(c.material)?c.material:[c.material];m.forEach(m=>{m.color=new T.Color(0x2e2e2e);m.roughness=.5;m.metalness=.4;m.envMapIntensity=1.2})}});return g}),makeWarmEnv()])
 const loadTimeout=new Promise(res=>setTimeout(()=>res('TIMEOUT'),15000))
 
 Promise.race([loadAll,loadTimeout]).then(v=>{
@@ -1034,6 +1058,7 @@ rdr.domElement.addEventListener('mousemove',e=>{
     let o=i.object
     while(o.parent&&!o.userData?.isGun)o=o.parent
     if(o.userData?.isGun&&!_anims.some(a=>a.gw===o)){gun=o;break}
+    if(!o.userData?.isGun)break
   }
   if(gun!==_prevHover){
     if(_prevHover&&_prevHover.userData.indEl){
@@ -1059,9 +1084,10 @@ rdr.domElement.addEventListener('click',e=>{
   for(const i of _rc.intersectObjects(sc.children,true)){
     let o=i.object
     while(o.parent&&!o.userData?.isGun&&!o.userData?.isInd&&!o.userData?.isRack)o=o.parent
-    if(o.userData?.isGun&&!_anims.some(a=>a.gw===o)){gun=o;break}
-    if(o.userData?.isInd&&!ind)ind=o
-    if(o.userData?.isRack&&!hit)hit=o
+    if(o.userData?.isGun&&!_anims.some(a=>a.gw===o)){gun=o}
+    else if(o.userData?.isInd)ind=o
+    else if(o.userData?.isRack)hit=o
+    break
   }
   if(e.ctrlKey&&gun){let rack=gun.parent;while(rack&&!rack.userData?.isRack)rack=rack.parent;if(rack)startInspect(gun,rack);return}
   if(gun){checkoutGun(gun);return}

@@ -511,8 +511,7 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
   }
 
   const m16t=prep(m16g.scene)
-  const yawWrap=(t,a)=>{const g=new T.Group();g.add(t);g.rotation.y=a;return g}
-  const ak47t=yawWrap(prep(ak47g.scene),Math.PI)
+  const ak47t=prep(ak47g.scene);ak47t.rotation.y=-Math.PI/2
 
   function makeShortButt(group){
     let my=Infinity,My=-Infinity
@@ -538,7 +537,7 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
   const m60t=prep(m60g.scene);m60t.scale.multiplyScalar(1.05)
   const mg42t=prep(mg42g.scene);mg42t.scale.multiplyScalar(1.22)
   const c90t=prep(c90g.scene);c90t.scale.multiplyScalar(1.0)
-  const rpgt=prep(rpgg.scene);rpgt.scale.multiplyScalar(.95)
+  const rpgt=prep(rpgg.scene);rpgt.scale.multiplyScalar(.95);rpgt.rotation.y=-Math.PI/2
 
   // ── PLACE GUNS ──
   const silCache={}

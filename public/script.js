@@ -1221,11 +1221,7 @@ function tick(){
     if(!g)return
     const missing=(rd.a1-rd.a1Rem)+(rd.a2-rd.a2Rem)
     if(missing>0){
-      g.material.opacity=t*3%1>.5?0:1
-      // blink indicator lights for missing guns
-      const blink=t*4%1>.5
-      rd.a1G.forEach(gw=>{if(!rd._rem?.includes(gw)&&gw.userData.indEl){gw.userData.indEl.material.visible=blink}})
-      rd.a2G.forEach(gw=>{if(!rd._rem?.includes(gw)&&gw.userData.indEl){gw.userData.indEl.material.visible=blink}})
+      g.material.opacity=1
     }else{g.material.opacity=0}
   })
   if(_walkMode&&cam.position.y<.2)cam.position.y=.2

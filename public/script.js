@@ -9,7 +9,7 @@ const sc=new T.Scene()
 const bgCol=new T.Color(0x1e1913)
 
 const cam=new T.PerspectiveCamera(50,innerWidth/innerHeight,0.1,120)
-cam.position.set(0,3.2,4.5)
+cam.position.set(0,2.5,3.4)
 
 const rdr=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})
 rdr.setSize(innerWidth,innerHeight)
@@ -28,7 +28,7 @@ ldr.domElement.style.zIndex='11'
 document.body.appendChild(ldr.domElement)
 
 const ctrl=new OrbitControls(cam,rdr.domElement)
-ctrl.target.set(0,1.2,-0.2)
+ctrl.target.set(0,1.1,-.4)
 ctrl.enableDamping=true;ctrl.dampingFactor=.05
 ctrl.minPolarAngle=.15;ctrl.maxPolarAngle=Math.PI/2.05
 ctrl.minDistance=1.5;ctrl.maxDistance=25
@@ -460,6 +460,14 @@ function makeWarmEnv(){
     rg.addColorStop(1,'rgba(255,220,160,0)')
     x.fillStyle=rg;x.fillRect(lx-r,ly-r,r*2,r*2)
   }
+  for(let b=0;b<4;b++){
+    const bx=Math.random()*w,by=45+Math.random()*55,bw=130+Math.random()*140
+    const lg=x.createLinearGradient(bx,by-7,bx,by+7)
+    lg.addColorStop(0,'rgba(255,240,210,0)')
+    lg.addColorStop(.5,'rgba(255,240,210,.85)')
+    lg.addColorStop(1,'rgba(255,240,210,0)')
+    x.fillStyle=lg;x.fillRect(bx-bw/2,by-7,bw,14)
+  }
   const t=new T.CanvasTexture(c)
   t.mapping=T.EquirectangularReflectionMapping
   t.colorSpace=T.SRGBColorSpace
@@ -489,7 +497,7 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
   const pmrem=new T.PMREMGenerator(rdr)
   const envMap=pmrem.fromEquirectangular(hdr).texture
   sc.environment=envMap;sc.background=bgCol
-  sc.environmentIntensity=1.0
+  sc.environmentIntensity=1.25
   pmrem.dispose()
 
   // ── PREPARE MODELS ──
@@ -601,6 +609,7 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
       const x=-rackW/2+AB+(i+.5+offset)*aW/total
       const t=.32,y=t*H*.88,z=side*(D*(1-t)+.025)
       const clone=template.clone(true)
+      clone.traverse(m=>{if(m.isMesh){m.castShadow=true;m.receiveShadow=true}})
       if(tint&&tint<1)clone.traverse(c=>{
         if(c.isMesh&&c.material){
           c.material=c.material.clone()
@@ -620,6 +629,7 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
             }
             if(mt.emissive)mt.emissiveIntensity=Math.min(mt.emissiveIntensity||0,.08)
             mt.roughness=Math.min((mt.roughness??.6)*1.05,1)
+            if(mt.envMapIntensity!=null)mt.envMapIntensity=1.2
           })
         }
       })
@@ -1055,7 +1065,7 @@ document.addEventListener('mousemove',e=>{
 })
 // ── PRESET VIEWS ──
 const _presets={
-  '1':{pos:new T.Vector3(0,3.2,4.5),tgt:new T.Vector3(0,1.2,-.2)},
+  '1':{pos:new T.Vector3(0,2.5,3.4),tgt:new T.Vector3(0,1.1,-.4)},
   '2':{pos:new T.Vector3(0,8,0),tgt:new T.Vector3(0,0,-3.5)},
   '3':{pos:new T.Vector3(6,2,0),tgt:new T.Vector3(0,1.2,-2)},
   '4':{pos:new T.Vector3(-6,2,-5),tgt:new T.Vector3(0,1.2,-4)}
@@ -1133,12 +1143,12 @@ rdr.domElement.addEventListener('click',e=>{
     dp.y=c.y+sz.y*.1
     startFocus(dp,c)
   }else{
-    startFocus(new T.Vector3(0,3.2,4.5),new T.Vector3(0,1.2,-.2))
+    startFocus(new T.Vector3(0,2.5,3.4),new T.Vector3(0,1.1,-.4))
   }
 })
 window.addEventListener('keydown',e=>{
   const hel=document.getElementById('help'),lPanel=document.getElementById('log')
-  if(e.key==='Escape'){const s=document.getElementById('search');if(s.style.display==='block'){s.style.display='none';s.value='';return}if(_inspect){endInspect();return}lPanel.style.display='none';if(hel.style.display!=='none'){hel.style.display='none';return}startFocus(new T.Vector3(0,3.2,4.5),new T.Vector3(0,1.2,-.2))}
+  if(e.key==='Escape'){const s=document.getElementById('search');if(s.style.display==='block'){s.style.display='none';s.value='';return}if(_inspect){endInspect();return}lPanel.style.display='none';if(hel.style.display!=='none'){hel.style.display='none';return}startFocus(new T.Vector3(0,2.5,3.4),new T.Vector3(0,1.1,-.4))}
   if(e.key==='h'||e.key==='H'||e.key==='?')hel.style.display=hel.style.display==='none'?'flex':'none'
   if(e.key==='l'||e.key==='L'){
     if(lPanel.style.display==='none'||lPanel.style.display===''){

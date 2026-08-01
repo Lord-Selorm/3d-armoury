@@ -12,6 +12,7 @@ const cam=new T.PerspectiveCamera(50,innerWidth/innerHeight,0.1,120)
 cam.position.set(0,2.5,3.4)
 
 const rdr=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})
+rdr.setPixelRatio(Math.min(devicePixelRatio,2))
 rdr.setSize(innerWidth,innerHeight)
 rdr.toneMapping=T.ACESFilmicToneMapping
 rdr.toneMappingExposure=1.15
@@ -29,7 +30,7 @@ document.body.appendChild(ldr.domElement)
 
 const ctrl=new OrbitControls(cam,rdr.domElement)
 ctrl.target.set(0,1.1,-.4)
-ctrl.enableDamping=true;ctrl.dampingFactor=.05
+ctrl.enableDamping=true;ctrl.dampingFactor=.2;ctrl.rotateSpeed=1.3;ctrl.zoomSpeed=1.2
 ctrl.minPolarAngle=.15;ctrl.maxPolarAngle=Math.PI/2.05
 ctrl.minDistance=1.5;ctrl.maxDistance=25
 ctrl.update()

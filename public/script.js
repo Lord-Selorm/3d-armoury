@@ -685,6 +685,19 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
       const lbl=mkLabel(rackId,'label-rack','#e8d8c0')
       lbl.position.set(rx+rackW/2,2.5,rz);sc.add(lbl)
       rack.userData.labelEl=lbl.element
+      const labZoff=.45
+      const mkSide=(side,dx)=>{
+        const el=mkLabel(side,'label-rack','#e0d0b8')
+        el.position.set(rx+rackW/2+dx,1.0,rz);sc.add(el)
+        el.visible=false
+        return el
+      }
+      rack.userData.a1l=r.a1?mkSide('A1',-labZoff):null
+      rack.userData.a2l=r.a2?mkSide('A2',labZoff):null
+      rack.userData.setA12=(show)=>{
+        if(rack.userData.a1l)rack.userData.a1l.visible=show
+        if(rack.userData.a2l)rack.userData.a2l.visible=show
+      }
       const getModel=(g)=>g==='ak47'?ak47t:g==='m16s'?m16sbt:g==='cq'?m4a1t:g==='g3'?g3t:g==='uzi'?uzit:g==='sr25'?sr25t:g==='negev'?negevt:g==='m60'?m60t:g==='mg42'?mg42t:g==='c90'?c90t:g==='rpg'?rpgt:m16t
       const slant=.6
       const placeSide=(count,modelArr,side)=>{
@@ -1048,16 +1061,26 @@ const _presets={
   '4':{pos:new T.Vector3(-6,2,-5),tgt:new T.Vector3(0,1.2,-4)}
 }
 
-let _clickPos=null;let _prevHover=null
+let _clickPos=null;let _prevHover=null;let _prevRack=null
 rdr.domElement.addEventListener('mousemove',e=>{
   _pt.x=(e.clientX/innerWidth)*2-1;_pt.y=-(e.clientY/innerHeight)*2+1
   _rc.setFromCamera(_pt,cam)
-  let gun=null
+  let gun=null,rack=null
   for(const i of _rc.intersectObjects(sc.children,true)){
     let o=i.object
-    while(o.parent&&!o.userData?.isGun)o=o.parent
-    if(o.userData?.isGun&&!_anims.some(a=>a.gw===o)){gun=o;break}
-    if(!o.userData?.isGun)break
+    while(o.parent&&!o.userData?.isGun&&!o.userData?.isRack)o=o.parent
+    if(o.userData?.isGun){
+      if(_anims.some(a=>a.gw===o))continue
+      gun=o;rack=o.parent;while(rack&&!rack.userData?.isRack)rack=rack.parent
+      break
+    }
+    if(o.userData?.isRack){rack=o;break}
+    break
+  }
+  if(rack!==_prevRack){
+    if(_prevRack&&_prevRack.userData.setA12)_prevRack.userData.setA12(false)
+    _prevRack=rack
+    if(rack&&rack.userData.setA12)rack.userData.setA12(true)
   }
   if(gun!==_prevHover){
     if(_prevHover&&_prevHover.userData.indEl){
@@ -1070,7 +1093,7 @@ rdr.domElement.addEventListener('mousemove',e=>{
       if(gun.userData._origCol==null)gun.userData._origCol='#'+m.color.getHexString()
       m.color.set('#ffffff')
     }
-    rdr.domElement.style.cursor=gun?'pointer':'default'
+    rdr.domElement.style.cursor=gun||rack?'pointer':'default'
   }
 })
 rdr.domElement.addEventListener('mousedown',e=>{_clickPos={x:e.clientX,y:e.clientY}})

@@ -1054,6 +1054,28 @@ document.getElementById('search').addEventListener('input',function(){
     const bb=new T.Box3().setFromObject(found);const c=new T.Vector3();bb.getCenter(c)
     const sz=new T.Vector3();bb.getSize(sz)
     startFocus(c.clone().add(new T.Vector3(0,sz.y*.8,sz.z*.8)),c)
+    return
+  }
+  let w=null,rack=null,side=null,slot=0
+  for(const c of sc.children){
+    if(!c.userData?.isRack)continue
+    for(const g of (c.userData.a1G||[]).concat(c.userData.a2G||[])){
+      const wp=g.userData.weapon
+      if(!wp)continue
+      if(wp.s.toUpperCase().includes(q)||wp.r.toUpperCase().includes(q)||String(wp.b).toUpperCase()===q){
+        w=g;rack=c;side=g.userData.side;slot=g.userData.slot;break
+      }
+    }
+    if(w)break
+  }
+  if(w){
+    this.style.borderColor='#44cc66'
+    const wp=new T.Vector3();w.getWorldPosition(wp)
+    const dir=new T.Vector3();dir.subVectors(cam.position,wp);dir.y=Math.max(dir.y,.4);dir.normalize()
+    startFocus(wp.clone().addScaledVector(dir,.9).add(new T.Vector3(0,.35,0)),wp.clone().add(new T.Vector3(0,.05,0)))
+    burst(wp,10,'#22ee44')
+    const wpn=w.userData.weapon
+    showToast(`🔎 ${wpn.s} found · ${rack.userData.rackId} ${side} #${slot+1} · Butt ${wpn.b}`)
   }else this.style.borderColor='#cc4444'
 })
 // ── STATISTICS ──

@@ -228,8 +228,8 @@ function mkRack(a1N,a2N){
 
 // ── RACK DATA ──
 const secs=[
-  {name:'R.D.F',color:'#d4b898',racks:[
-    {a1:20,a2:20,gun:'m16'},{a1:23,a2:23,gun:'m16'},{a1:20,a2:20,gun:'m16s'}
+    {name:'R.D.F',color:'#d4b898',racks:[
+    {a1:20,a2:20,gun:'cq'},{a1:23,a2:23,gun:'cq'},{a1:20,a2:20,gun:'cq'}
   ]},
   {name:'81 Signal Reg',color:'#b8c8d8',racks:[
     {a1:39,a2:39,gun:{a1:'m16',a2:'cq'}},{a1:15,a2:0,gun:'ak47'}

@@ -238,9 +238,48 @@ const secs=[
     {a1:19,a2:19,gun:'cq'},{a1:22,a2:22,gun:'cq'},{a1:21,a2:21,gun:'cq'},
     {a1:22,a2:22,gun:'cq'},    {a1:19,a2:19,gun:'g3'},{a1:19,a2:19,gun:'g3'},
     {a1:22,a2:22,gun:'m16'},{a1:20,a2:0,gun:{a1:[{type:'ak47',count:10},{type:'uzi',count:10}]}},{a1:20,a2:20,gun:'m16'},
-    {a1:20,a2:0,gun:{a1:[{type:'sr25',count:7},{type:'negev',count:7},{type:'m60',count:6}]}},{a1:9,a2:0,gun:{a1:[{type:'mg42',count:3},{type:'c90',count:3},{type:'rpg',count:3}]}},{a1:10,a2:10,gun:{a1:'sr25',a2:'m16'}}
+    {a1:20,a2:0,gun:{a1:[{type:'sr25',count:7},{type:'negev',count:7},{type:'m60',count:6}]}},{a1:9,a2:0,gun:{a1:[{type:'mg42',count:3},{type:'c90',count:3},{type:'rpg',count:3}]}},    {a1:10,a2:10,gun:{a1:'sr25',a2:'m16'}}
   ]}
 ]
+
+const REAL_WEAPONS={
+  'RDF':[
+    {s:'000719',b:'B-00',r:'E2801170400021D434B0A20',c:'cq'},
+    {s:'001297',b:'23',r:'E2801170400021D434B0B21',c:'cq'},
+    {s:'000903',b:'B-00',r:'E2801170400021D434B0B28',c:'cq'},
+    {s:'000777',b:'33',r:'E2801170400021D434B0B2F',c:'cq'},
+    {s:'000684',b:'30',r:'E2801170400021D434B0B2B',c:'cq'},
+    {s:'000718',b:'B-00',r:'E2801170400021D434B0B2E',c:'cq'},
+    {s:'001063',b:'B-00',r:'E2801170400021D434B0B2D',c:'cq'},
+    {s:'000079',b:'18',r:'E2801170400021D434B0B29',c:'cq'},
+    {s:'000560',b:'246',r:'E2801170400021D434B0B27',c:'cq'},
+    {s:'A0057459',b:'B-00',r:'E2005174151700831080AAFO',c:'cq'},
+  ],
+  '81':[
+    {s:'26000413',b:'38',r:'E2801170400021D434B1324',c:'m16'},
+    {s:'26000396',b:'37',r:'E2801170400021D434B1320',c:'m16'},
+    {s:'26000391',b:'36',r:'E2801170400021D434B0A2E',c:'m16'},
+    {s:'26000389',b:'35',r:'E2801170400021D434B1321',c:'m16'},
+    {s:'26000338',b:'34',r:'E2801170400021D434B0A2C',c:'m16'},
+    {s:'26000327',b:'33',r:'E2801170400021D434B0A2D',c:'m16'},
+    {s:'26000303',b:'32',r:'E2801170400021D434B1322',c:'m16'},
+    {s:'26000188',b:'31',r:'E2801170400021D434B0A2F',c:'m16'},
+    {s:'3706391',b:'01',r:'E2801170400021D434B0A21',c:'ak47'},
+    {s:'T1717646',b:'B-00',r:'E2005174151700821080AAFO',c:'pistol'},
+  ],
+  'Southern C':[
+    {s:'006786',b:'06',r:'E2801170400021D434B0A29',c:'m16'},
+    {s:'003438',b:'10',r:'E2801170400021D434B0A24',c:'m16'},
+    {s:'005210',b:'143',r:'E2801170400021D434B0A28',c:'m16'},
+    {s:'001512',b:'54',r:'E2801170400021D434B0A27',c:'m16'},
+    {s:'004528',b:'53',r:'E2801170400021D434B0A2A',c:'m16'},
+    {s:'002107',b:'150',r:'E2801170400021D434B0A25',c:'m16'},
+    {s:'001812',b:'28',r:'E2801170400021D434B0A26',c:'m16'},
+    {s:'005673',b:'73',r:'E2801170400021D434B0A23',c:'m16'},
+    {s:'006791',b:'74',r:'E2801170400021D434B0A22',c:'m16'},
+    {s:'006289',b:'44',r:'E2801170400021D434B0A2B',c:'m16'},
+  ],
+}
 
 function mkLabel(text,cls,color){
   const d=document.createElement('div')
@@ -291,7 +330,8 @@ function startInspect(gunW,rack){
   const weight=g==='ak47'?'3.4 kg':g==='uzi'?'3.5 kg':g==='sr25'?'3.5 kg':g==='negev'?'7.5 kg':g==='m60'?'10.5 kg':g==='mg42'?'11.6 kg':g==='c90'?'5.1 kg':g==='rpg'?'6.3 kg':g==='g3'?'4.4 kg':'3.2 kg'
   const el=document.getElementById('inspInfo')
   el.style.display='block'
-  el.innerHTML=`<b>${mName}</b><div style="display:flex;gap:14px;margin:4px 0;font-size:11px;color:#887a66"><span>📏 ${cal}</span><span>⚖ ${weight}</span></div><span style="font-size:11px;color:#6a6a7a">${gn} · Drag to rotate · Esc to exit</span>`
+  const wp=gunW.userData.weapon
+  el.innerHTML=`<b>${mName}</b>${wp?`<div style="margin-top:3px;font-size:10px;letter-spacing:1px;color:#9ac94f">REGISTERED · ${wp.s}</div>`:''}<div style="display:flex;gap:14px;margin:4px 0;font-size:11px;color:#887a66"><span>📏 ${cal}</span><span>⚖ ${weight}</span></div>${wp?`<div style="font-size:11px;color:#9a8a72;line-height:1.6">Butt <b>${wp.b}</b><br>RFID <span style="letter-spacing:.5px;font-family:monospace">${wp.r}</span></div>`:''}<span style="font-size:11px;color:#6a6a7a">${gn} · Drag to rotate · Esc to exit</span>`
 
   _inspect={gSc,gCam,gRdr,clone,gunW,rack}
   ldr.domElement.style.display='none'
@@ -791,10 +831,30 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
     _pupdate();updateBadge();drawMap()
   }
 
+  function connectRealData(){
+    const catMap={m16:'m16',cq:'cq',ak47:'ak47'}
+    const used=new Set(),guns={}
+    sc.children.forEach(c=>{
+      if(!c.userData?.isRack)return
+      const rd=c.userData
+      ;(rd.a1G||[]).concat(rd.a2G||[]).forEach(w=>{(guns[rd.secIdx]=guns[rd.secIdx]||[]).push(w)})
+    })
+    ;['RDF','81','Southern C'].forEach((key,i)=>{
+      const arr=guns[i]||[]
+      REAL_WEAPONS[key].forEach(wp=>{
+        const want=catMap[wp.c]
+        let w=arr.find(g=>!used.has(g)&&g.userData.gunType===want)
+        if(!w)w=arr.find(g=>!used.has(g))
+        if(w){w.userData.weapon=wp;used.add(w)}
+      })
+    })
+  }
+
   // ── DONE ──
   document.getElementById('load').style.display='none'
   sc.children.forEach(c=>{if(c.userData?.isRack)updateRackLabel(c.userData)})
   loadState()
+  connectRealData()
 }).catch(e=>{
   document.getElementById('load').innerHTML='<span style="color:#c04040">ERROR: '+(e.message||e)+'</span>'
   console.error(e)
@@ -1266,3 +1326,34 @@ addEventListener('resize',()=>{
   rdr.setSize(innerWidth,innerHeight);ldr.setSize(innerWidth,innerHeight)
   if(_inspect){_inspect.gCam.aspect=innerWidth/innerHeight;_inspect.gCam.updateProjectionMatrix();_inspect.gRdr.setSize(innerWidth,innerHeight)}
 })
+
+// Debug introspection for automated checks
+window.__dbg=(n=0)=>{  let racks=0,guns=0,reg=0,akOnAk=0,sec=[0,0,0],samples=[]
+  sc.children.forEach(c=>{
+    if(!c.userData?.isRack)return
+    racks++;sec[c.userData.secIdx]++
+    ;(c.userData.a1G||[]).concat(c.userData.a2G||[]).forEach(w=>{
+      guns++
+      if(w.userData.weapon){
+        reg++
+        if(w.userData.weapon.c==='ak47'&&w.userData.gunType==='ak47')akOnAk++
+        if(samples.length<n)samples.push({sec:c.userData.secIdx,type:w.userData.gunType,s:w.userData.weapon.s,b:w.userData.weapon.b,r:w.userData.weapon.r,c:w.userData.weapon.c})
+      }
+    })
+  })
+  return {racks,guns,reg,akOnAk,sec,samples}
+}
+window.__proj=(serial)=>{
+  const v=new T.Vector3()
+  for(const c of sc.children){
+    if(!c.userData?.isRack)continue
+    for(const w of (c.userData.a1G||[]).concat(c.userData.a2G||[])){
+      if(w.userData.weapon&&w.userData.weapon.s===serial){
+        w.getWorldPosition(v)
+        v.project(cam)
+        return {x:v.x,y:v.y}
+      }
+    }
+  }
+  return null
+}

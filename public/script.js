@@ -1029,10 +1029,37 @@ function undoLast(){
 // ── AUTO RESTORE ──
 const _autoTimers=[],_autoRestoreMs=120000
 function clearAllTimers(){_autoTimers.forEach(t=>clearTimeout(t.timer));_autoTimers.length=0}
+// ── SEARCH MARKER (blinking light above matched gun) ──
+let _sMark=null
+function clearSearchMark(){
+  if(!_sMark)return
+  sc.remove(_sMark.spr);sc.remove(_sMark.lbl)
+  if(_sMark.tex)_sMark.tex.dispose()
+  _sMark=null
+}
+function showSearchMark(gunW){
+  clearSearchMark()
+  const v=new T.Vector3();gunW.getWorldPosition(v)
+  const can=document.createElement('canvas');can.width=64;can.height=64
+  const cx=can.getContext('2d')
+  const grd=cx.createRadialGradient(32,32,2,32,32,30)
+  grd.addColorStop(0,'rgba(80,255,120,1)');grd.addColorStop(1,'rgba(80,255,120,0)')
+  cx.fillStyle=grd;cx.fillRect(0,0,64,64)
+  const tex=new T.CanvasTexture(can)
+  const spr=new T.Sprite(new T.SpriteMaterial({map:tex,transparent:true,blending:T.AdditiveBlending,depthWrite:false}))
+  spr.position.set(v.x,v.y+.85,v.z);spr.scale.set(.7,.7,1);sc.add(spr)
+  const d=document.createElement('div')
+  d.textContent='⬆ SERIAL '+gunW.userData.weapon.s
+  d.style.color='#66ff88';d.style.font='bold 13px monospace';d.style.background='rgba(0,0,0,.65)'
+  d.style.padding='3px 10px';d.style.borderRadius='4px';d.style.letterSpacing='1px';d.style.pointerEvents='none'
+  const lbl=new CSS2DObject(d)
+  lbl.position.set(v.x,v.y+1.25,v.z);sc.add(lbl)
+  _sMark={spr,lbl,tex,birth:Date.now()}
+}
 // ── SEARCH ──
 document.getElementById('search').addEventListener('input',function(){
   const q=this.value.trim().toUpperCase()
-  if(!q){this.style.borderColor='#5a4a3a';return}
+  if(!q){this.style.borderColor='#5a4a3a';clearSearchMark();return}
   let found=null
   sc.children.forEach(c=>{
     if(!c.userData?.isRack)return
@@ -1065,6 +1092,7 @@ document.getElementById('search').addEventListener('input',function(){
     burst(wp,10,'#22ee44')
     const wpn=w.userData.weapon
     showToast(`🔎 ${wpn.s} found · ${rack.userData.rackId} ${side} #${slot+1} · Butt ${wpn.b}`)
+    showSearchMark(w)
   }else this.style.borderColor='#cc4444'
 })
 // ── STATISTICS ──
@@ -1220,7 +1248,7 @@ rdr.domElement.addEventListener('click',e=>{
 })
 window.addEventListener('keydown',e=>{
   const hel=document.getElementById('help'),lPanel=document.getElementById('log')
-  if(e.key==='Escape'){const s=document.getElementById('search');if(s.style.display==='block'){s.style.display='none';s.value='';return}if(_inspect){endInspect();return}lPanel.style.display='none';if(hel.style.display!=='none'){hel.style.display='none';return}startFocus(new T.Vector3(0,2.5,3.4),new T.Vector3(0,1.1,-.4))}
+  if(e.key==='Escape'){const s=document.getElementById('search');if(s.style.display==='block'){s.style.display='none';s.value='';clearSearchMark();return}if(_inspect){endInspect();return}lPanel.style.display='none';if(hel.style.display!=='none'){hel.style.display='none';return}startFocus(new T.Vector3(0,2.5,3.4),new T.Vector3(0,1.1,-.4))}
   if(e.key==='h'||e.key==='H'||e.key==='?')hel.style.display=hel.style.display==='none'?'flex':'none'
   if(e.key==='l'||e.key==='L'){
     if(lPanel.style.display==='none'||lPanel.style.display===''){
@@ -1312,6 +1340,12 @@ function tick(){
   moveCam();processAnims();processBursts()
   const t=Date.now()*.001
   flickerLights.forEach(l=>{l.intensity=l.userData.baseInt*(.7+.3*Math.sin(t*l.userData.spd+l.userData.phase))})
+  if(_sMark){
+    const p=.5+.5*Math.sin(t*5)
+    _sMark.spr.material.opacity=.3+.7*p
+    _sMark.spr.scale.setScalar(.5+.4*p)
+    if(Date.now()-_sMark.birth>8000)clearSearchMark()
+  }
   sc.children.forEach(c=>{
     if(!c.userData?.isRack)return
     const rd=c.userData,g=rd.glowEl
@@ -1370,3 +1404,4 @@ window.__proj=(serial)=>{
 }
 window.__camSet=(p,t)=>{cam.position.fromArray(p);ctrl.target.fromArray(t);ctrl.update()}
 window.__camGet=()=>({p:cam.position.toArray(),t:ctrl.target.toArray()})
+window.__sMark=()=>_sMark?{opacity:+(_sMark.spr.material.opacity.toFixed(2)),scale:+(_sMark.spr.scale.x.toFixed(2)),age:Date.now()-_sMark.birth,label:_sMark.lbl&&_sMark.lbl.element?(_sMark.lbl.element.textContent||''):''}:null

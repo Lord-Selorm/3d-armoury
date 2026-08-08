@@ -110,18 +110,12 @@ sc.add(fl1)
 const rimL=new T.DirectionalLight(0xffe0b8,2.5);rimL.position.set(5,8,8);sc.add(rimL)
 const blimL=new T.DirectionalLight(0xffd8a8,4);blimL.position.set(0,3,-5);sc.add(blimL)
 const scl=new T.DirectionalLight(0xffdcb0,3);scl.position.set(0,5,-8);sc.add(scl)
-const flimL=new T.DirectionalLight(0xf0e0f8,.6);flimL.position.set(0,1.5,5);sc.add(flimL)
-const bncL=new T.DirectionalLight(0xa09080,1);bncL.position.set(0,-2,0);sc.add(bncL)
-for(let x=-1;x<=1;x+=2)
-  for(let z=-1;z<=1;z+=2){
-    const wl=new T.DirectionalLight(0xfff8f0,.5);wl.position.set(x*5,3,z*3);sc.add(wl)
-  }
 const km=new T.Mesh(new T.SphereGeometry(.06,8,6),new T.MeshBasicMaterial({color:'#ffd0a0'}))
 km.position.copy(kl.position);sc.add(km)
 
 // ── FLICKERING CEILING LIGHTS ──
 const flickerLights=[]
-for(let i=0;i<8;i++){
+for(let i=0;i<4;i++){
   const px=(Math.random()-.5)*10, pz=(Math.random()-.5)*8-4
   const l=new T.PointLight(0xffeecc,7+Math.random()*3,16)
   l.position.set(px,4.2,pz)
@@ -1374,3 +1368,5 @@ window.__proj=(serial)=>{
   }
   return null
 }
+window.__camSet=(p,t)=>{cam.position.fromArray(p);ctrl.target.fromArray(t);ctrl.update()}
+window.__camGet=()=>({p:cam.position.toArray(),t:ctrl.target.toArray()})

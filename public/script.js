@@ -17,7 +17,7 @@ rdr.setSize(innerWidth,innerHeight)
 rdr.toneMapping=T.ACESFilmicToneMapping
 rdr.toneMappingExposure=1.15
 rdr.shadowMap.enabled=true
-rdr.shadowMap.type=T.PCFShadowMap
+rdr.shadowMap.type=T.PCFSoftShadowMap
 rdr.outputColorSpace=T.SRGBColorSpace
 document.body.appendChild(rdr.domElement)
 
@@ -102,7 +102,7 @@ kl.shadow.mapSize.set(2048,2048)
 kl.shadow.camera.near=.5;kl.shadow.camera.far=24
 kl.shadow.camera.left=-16;kl.shadow.camera.right=16
 kl.shadow.camera.top=14;kl.shadow.camera.bottom=-6
-kl.shadow.bias=-.0008;kl.shadow.normalBias=.02
+kl.shadow.bias=-.0008;kl.shadow.normalBias=.05
 sc.add(kl)
 const fl1=new T.DirectionalLight(0xe8dcf0,2)
 fl1.position.set(-8,10,-6)

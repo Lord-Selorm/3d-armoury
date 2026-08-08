@@ -17,7 +17,7 @@ rdr.setSize(innerWidth,innerHeight)
 rdr.toneMapping=T.ACESFilmicToneMapping
 rdr.toneMappingExposure=1.15
 rdr.shadowMap.enabled=true
-rdr.shadowMap.type=T.PCFSoftShadowMap
+rdr.shadowMap.type=T.PCFShadowMap
 rdr.outputColorSpace=T.SRGBColorSpace
 document.body.appendChild(rdr.domElement)
 
@@ -98,19 +98,14 @@ rowsZ.forEach(z=>{
 const ambient=new T.AmbientLight(0xfff0e0,.45);sc.add(ambient)
 const kl=new T.DirectionalLight(0xffe8cc,7)
 kl.position.set(10,14,6);kl.castShadow=true
-kl.shadow.mapSize.set(4096,4096)
+kl.shadow.mapSize.set(2048,2048)
 kl.shadow.camera.near=.5;kl.shadow.camera.far=24
 kl.shadow.camera.left=-16;kl.shadow.camera.right=16
 kl.shadow.camera.top=14;kl.shadow.camera.bottom=-6
 kl.shadow.bias=-.0008;kl.shadow.normalBias=.02
 sc.add(kl)
 const fl1=new T.DirectionalLight(0xe8dcf0,2)
-fl1.position.set(-8,10,-6);fl1.castShadow=true
-fl1.shadow.mapSize.set(2048,2048)
-fl1.shadow.camera.near=.5;fl1.shadow.camera.far=20
-fl1.shadow.camera.left=-12;fl1.shadow.camera.right=12
-fl1.shadow.camera.top=10;fl1.shadow.camera.bottom=-4
-fl1.shadow.bias=-.0005;fl1.shadow.normalBias=.01
+fl1.position.set(-8,10,-6)
 sc.add(fl1)
 const rimL=new T.DirectionalLight(0xffe0b8,2.5);rimL.position.set(5,8,8);sc.add(rimL)
 const blimL=new T.DirectionalLight(0xffd8a8,4);blimL.position.set(0,3,-5);sc.add(blimL)

@@ -12,7 +12,7 @@ const cam=new T.PerspectiveCamera(50,innerWidth/innerHeight,0.1,120)
 cam.position.set(0,2.5,3.4)
 
 const rdr=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})
-rdr.setPixelRatio(Math.min(devicePixelRatio,2))
+rdr.setPixelRatio(Math.min(devicePixelRatio,1.5))
 rdr.setSize(innerWidth,innerHeight)
 rdr.toneMapping=T.ACESFilmicToneMapping
 rdr.toneMappingExposure=1.15
@@ -639,7 +639,7 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
       const x=-rackW/2+AB+(i+.5+offset)*aW/total
       const t=.32,y=t*H*.88,z=side*(D*(1-t)+.025)
       const clone=template.clone(true)
-      clone.traverse(m=>{if(m.isMesh){m.castShadow=true;m.receiveShadow=true}})
+      clone.traverse(m=>{if(m.isMesh){m.receiveShadow=true}})
       if(tint&&tint<1)clone.traverse(c=>{
         if(c.isMesh&&c.material){
           c.material=c.material.clone()
@@ -651,6 +651,7 @@ Promise.race([loadAll,loadTimeout]).then(v=>{
       bp.position.set(x,.32,side*.55);rack.add(bp)
       clone.traverse(c=>{
         if(c.isMesh&&c.material){
+          c.userData.isGunMesh=true
           const m=Array.isArray(c.material)?c.material:[c.material]
           const v=.94+Math.random()*.12
           m.forEach(mt=>{
@@ -1168,9 +1169,12 @@ const _presets={
   '4':{pos:new T.Vector3(-6,2,-5),tgt:new T.Vector3(0,1.2,-4)}
 }
 
-let _clickPos=null;let _prevHover=null;let _prevRack=null
+let _clickPos=null;let _prevHover=null;let _prevRack=null;let _lastRay=0
 rdr.domElement.addEventListener('mousemove',e=>{
   _pt.x=(e.clientX/innerWidth)*2-1;_pt.y=-(e.clientY/innerHeight)*2+1
+  const now=performance.now()
+  if(now-_lastRay<50&&_lastRay)return
+  _lastRay=now
   _rc.setFromCamera(_pt,cam)
   let gun=null,rack=null
   for(const i of _rc.intersectObjects(sc.children,true)){
@@ -1332,6 +1336,7 @@ document.addEventListener('mousemove',e=>{
 document.addEventListener('mouseup',()=>{_dragStart=null})
 
 // ── TICK ──
+let _fmCount=0,_fmStat=null
 function tick(){
   requestAnimationFrame(tick)
   moveCam();processAnims();processBursts()
@@ -1352,7 +1357,9 @@ function tick(){
     _inspect.gRdr.render(_inspect.gSc,_inspect.gCam)
   }
   if(!_animCam()&&!_inspect)ctrl.update()
+  const _tm0=performance.now()
   rdr.render(sc,cam);ldr.render(sc,cam)
+  if(++_fmCount%15===0)_fmStat={calls:rdr.info.render.calls,tris:rdr.info.render.triangles,ms:+((performance.now()-_tm0)).toFixed(1)}
 }
 tick()
 setInterval(()=>{if(sc.children.length)drawMap()},600)
@@ -1395,4 +1402,20 @@ window.__proj=(serial)=>{
 }
 window.__camSet=(p,t)=>{cam.position.fromArray(p);ctrl.target.fromArray(t);ctrl.update()}
 window.__camGet=()=>({p:cam.position.toArray(),t:ctrl.target.toArray()})
+window.__perf=()=>({calls:rdr.info.render.calls,tris:rdr.info.render.triangles,sh:rdr.shadowMap.enabled})
+window.__measure=()=>{
+  const t0=performance.now()
+  rdr.render(sc,cam)
+  const ms=performance.now()-t0
+  const c=rdr.info.render.calls,t=rdr.info.render.triangles
+  rdr.clear()
+  return {ms:+ms.toFixed(1),calls:c,tris:t,sh:rdr.shadowMap.enabled,pr:rdr.domElement.width+'x'+rdr.domElement.height}
+}
+window.__castCount=()=>{
+  let n=0,g=0
+  sc.traverse(o=>{if(o.isMesh){if(o.userData&&o.userData.isGunMesh)g++;if(o.castShadow)n++}})
+  return {casters:n,gunMeshes:g}
+}
+window.__setShadows=e=>{rdr.shadowMap.enabled=!!e}
+window.__setAllShadow=(e)=>{sc.traverse(o=>{if(o.isMesh&&o.userData&&o.userData.isGunMesh)o.castShadow=!!e})}
 window.__glow=()=>_searchGlow?{alive:true,opacity:Math.round(_searchGlow.mat.opacity*100)}:null

@@ -12,7 +12,21 @@ const cam=new T.PerspectiveCamera(50,innerWidth/innerHeight,0.1,120)
 cam.position.set(0,2.5,3.4)
 
 const rdr=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})
-rdr.setPixelRatio(Math.min(devicePixelRatio,1.5))
+const _prSteps=[2,1.75,1.5,1.25,1]
+const _MAXPR=Math.min(devicePixelRatio||1,2)
+let _curPr=_MAXPR,_prGuard=0
+const _prSamples=[]
+function _applyPr(idx){_curPr=_prSteps[idx];rdr.setPixelRatio(_curPr)}
+function _autoPr(){
+  if(_prSamples.length<30)return
+  let s=0;for(const v of _prSamples)s+=v
+  const avg=s/_prSamples.length
+  _prSamples.length=0
+  const i=_prSteps.indexOf(_curPr)
+  if(avg>170&&i<_prSteps.length-1)_applyPr(i+1)
+  else if(avg<=95&&i>0&&_prSteps[i-1]<=_MAXPR)_applyPr(i-1)
+}
+rdr.setPixelRatio(_curPr)
 rdr.setSize(innerWidth,innerHeight)
 rdr.toneMapping=T.ACESFilmicToneMapping
 rdr.toneMappingExposure=1.15
@@ -1393,6 +1407,9 @@ function tick(){
   if(!_animCam()&&!_inspect)ctrl.update()
   const _tm0=performance.now()
   rdr.render(sc,cam);ldr.render(sc,cam)
+  _prSamples.push(performance.now()-_tm0)
+  if(_prSamples.length>90)_prSamples.shift()
+  if(++_prGuard>=60){_prGuard=0;_autoPr()}
   if(++_fmCount%15===0)_fmStat={calls:rdr.info.render.calls,tris:rdr.info.render.triangles,ms:+((performance.now()-_tm0)).toFixed(1)}
 }
 tick()
@@ -1452,4 +1469,6 @@ window.__castCount=()=>{
 }
 window.__setShadows=e=>{rdr.shadowMap.enabled=!!e}
 window.__setAllShadow=(e)=>{sc.traverse(o=>{if(o.isMesh&&o.userData&&o.userData.isGunMesh)o.castShadow=!!e})}
+window.__pr=()=>({cur:_curPr,max:_MAXPR,samples:_prSamples.length})
+window.__setPr=(p)=>{const i=_prSteps.indexOf(p);if(i>=0)_applyPr(i)}
 window.__glow=()=>_searchGlow?{alive:true,opacity:Math.round(_searchGlow.mat.opacity*100)}:null

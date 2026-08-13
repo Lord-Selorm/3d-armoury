@@ -516,21 +516,16 @@ function applyTex(group,texDir,names){
   })
 }
 
-const loadAll=Promise.all([loadGLB('models/m16.glb'),loadGLB('models/ak47.glb'),loadGLB('models/uzi.glb'),loadGLB('models/sr25.glb'),loadGLB('models/negev.glb'),loadGLB('models/m60.glb'),loadGLB('models/mg42.glb'),loadGLB('models/c90.glb'),loadGLB('models/rpg7.glb'),loadFBX('models/m4a1_oga/M4A1.fbx').then(g=>{applyTex(g,'models/m4a1_oga/',{map:'M4A1_Base_Color.png',normalMap:'M4A1_Normal.png',metalnessMap:'M4A1_Metallic.png',roughnessMap:'M4A1_Roughness.png'});return g}),loadFBX('models/g3_model/Gun.fbx').then(g=>{applyTex(g,'models/g3_model/',{map:'Texture_Base_Color.png',normalMap:'Texture_Normal.png',metalnessMap:'Texture_Metallic.png',roughnessMap:'Texture_Roughness.png',aoMap:'Texture_Mixed_AO.png'});g.traverse(c=>{if(c.isMesh&&c.material){const m=Array.isArray(c.material)?c.material:[c.material];m.forEach(m=>{m.color=new T.Color(0x2e2e2e);m.roughness=.5;m.metalness=.4;m.envMapIntensity=1.2})}});return g}),makeWarmEnv()])
-setTimeout(()=>{
-  const el=document.getElementById('load')
-  if(el&&el.style.display!=='none')el.innerHTML='<span>slow connection — still fetching models…</span>'
-},15000)
+// ── PROGRESSIVE BUILD ──
+const LOAD_TYPES=['m16','cq','ak47','g3','uzi','sr25','negev','m60','mg42','c90','rpg']
+const _templates={}
+let _finalized=false,_shellDone=false,_secEls=[]
 
-loadAll.then(v=>{
-  const [m16g,ak47g,uzig,sr25g,negevg,m60g,mg42g,c90g,rpgg,m4a1g,g3g,hdr]=v
-  const isFbx=m4a1g.isGroup
-
-  const pmrem=new T.PMREMGenerator(rdr)
-  const envMap=pmrem.fromEquirectangular(hdr).texture
-  sc.environment=envMap;sc.background=bgCol
-  sc.environmentIntensity=1.25
-  pmrem.dispose()
+const _pmrem=new T.PMREMGenerator(rdr)
+sc.environment=_pmrem.fromEquirectangular(makeWarmEnv()).texture
+sc.background=bgCol
+sc.environmentIntensity=1.25
+_pmrem.dispose()
 
   // ── PREPARE MODELS ──
   function prep(scene){
@@ -550,9 +545,6 @@ loadAll.then(v=>{
     return g
   }
 
-  const m16t=prep(m16g.scene)
-  const ak47t=prep(ak47g.scene);ak47t.rotation.y=-Math.PI/2
-
   function makeShortButt(group){
     let my=Infinity,My=-Infinity
     group.traverse(c=>{if(!c.isMesh||!c.geometry.attributes.position)return;const a=c.geometry.attributes.position.array;for(let i=0;i<a.length;i+=3){if(a[i+1]<my)my=a[i+1];if(a[i+1]>My)My=a[i+1]}})
@@ -567,17 +559,6 @@ loadAll.then(v=>{
     })
     return group
   }
-  const m16sbt=makeShortButt(prep(m16g.scene))
-
-  const m4a1t=prep(isFbx?m4a1g:m4a1g.scene);m4a1t.scale.multiplyScalar(.84)
-  const g3t=prep(g3g);g3t.scale.multiplyScalar(1.02)
-  const uzit=prep(uzig.scene);uzit.scale.multiplyScalar(.47)
-  const sr25t=prep(sr25g.scene);sr25t.scale.multiplyScalar(1.0)
-  const negevt=prep(negevg.scene)
-  const m60t=prep(m60g.scene);m60t.scale.multiplyScalar(1.05)
-  const mg42t=prep(mg42g.scene);mg42t.scale.multiplyScalar(1.22)
-  const c90t=prep(c90g.scene);c90t.scale.multiplyScalar(1.0)
-  const rpgt=prep(rpgg.scene);rpgt.scale.multiplyScalar(.95);rpgt.rotation.y=-Math.PI/2
 
   // ── PLACE GUNS ──
   const silCache={}
@@ -722,7 +703,7 @@ loadAll.then(v=>{
       const rackId=`${prefix} R${ni}`
       const gunA1=typeof r.gun==='string'?r.gun:r.gun.a1
       const gunA2=typeof r.gun==='string'?r.gun:r.gun.a2
-      rack.userData={isRack:true,rackId,a1:r.a1,a2:r.a2,a1Rem:r.a1,a2Rem:r.a2,a1G:[],a2G:[],secIdx:ri,gunA1,gunA2}
+      rack.userData={isRack:true,rackId,a1:r.a1,a2:r.a2,a1Rem:r.a1,a2Rem:r.a2,a1G:[],a2G:[],secIdx:ri,gunA1,gunA2,_rackW:rackW}
 
       const fmtGun=(g)=>Array.isArray(g)?g.map(x=>`${x.type.toUpperCase()}×${x.count}`).join('+'):g.toUpperCase()
       const lbl=mkLabel(rackId,'label-rack','#e8d8c0')
@@ -741,23 +722,20 @@ loadAll.then(v=>{
         if(rack.userData.a1l)rack.userData.a1l.visible=show
         if(rack.userData.a2l)rack.userData.a2l.visible=show
       }
-      const getModel=(g)=>g==='ak47'?ak47t:g==='m16s'?m16sbt:g==='cq'?m4a1t:g==='g3'?g3t:g==='uzi'?uzit:g==='sr25'?sr25t:g==='negev'?negevt:g==='m60'?m60t:g==='mg42'?mg42t:g==='c90'?c90t:g==='rpg'?rpgt:m16t
-      const slant=.6
-      const placeSide=(count,modelArr,side)=>{
+      const spec=[]
+      const buildSpec=(count,modelArr,side)=>{
         if(!count)return
         if(Array.isArray(modelArr)){
           let off=0
           const total=count
-          modelArr.forEach(({type,count:c})=>{
-            placeGuns(rack,getModel(type),c,side,slant,rackW,1,off,total,type)
-            off+=c
-          })
+          modelArr.forEach(({type,count:c})=>{spec.push({type,count:c,off,total,side});off+=c})
         }else{
-          placeGuns(rack,getModel(modelArr),count,side,slant,rackW,1,0,count,modelArr)
+          spec.push({type:modelArr,count,off:0,total:count,side})
         }
       }
-      placeSide(r.a1,gunA1,-1)
-      placeSide(r.a2,gunA2,1)
+      buildSpec(r.a1,gunA1,-1)
+      buildSpec(r.a2,gunA2,1)
+      rack.userData._spec=spec
 
       const gMat=new T.MeshBasicMaterial({
         color:'#ff0000',transparent:true,opacity:0
@@ -779,7 +757,7 @@ loadAll.then(v=>{
   })
 
   // ── PERSISTENCE ──
-  const _secEls=rows.map(r=>r._secEl)
+  _secEls=rows.map(r=>r._secEl)
   _pupdate=()=>{
     const sums=rows.map(()=>({total:0,rem:0}))
     sc.children.forEach(c=>{
@@ -842,15 +820,69 @@ loadAll.then(v=>{
     })
   }
 
-  // ── DONE ──
-  document.getElementById('load').style.display='none'
-  sc.children.forEach(c=>{if(c.userData?.isRack)updateRackLabel(c.userData)})
-  loadState()
-  connectRealData()
-}).catch(e=>{
-  document.getElementById('load').innerHTML='<span style="color:#c04040">ERROR: '+(e.message||e)+'</span>'
-  console.error(e)
-})
+  _shellDone=true
+
+  // ── PROGRESSIVE FILL ──
+  function fillType(type){
+    const tmpl=_templates[type];if(!tmpl)return
+    sc.children.forEach(rack=>{
+      if(!rack.userData?.isRack)return
+      ;(rack.userData._spec||[]).forEach(e=>{
+        if(e.type!==type)return
+        placeGuns(rack,tmpl,e.count,e.side,.6,rack.userData._rackW,1,e.off,e.total,type)
+      })
+    })
+  }
+  function updateLoadUI(slow){
+    const el=document.getElementById('load')
+    if(!el||el.style.display==='none')return
+    const n=LOAD_TYPES.filter(t=>_templates[t]).length
+    const msg=slow&&n<LOAD_TYPES.length?('slow connection — still fetching… '+n+'/'+LOAD_TYPES.length):(n?('loading models '+n+'/'+LOAD_TYPES.length+'…'):'LOADING ARMOURY…')
+    el.innerHTML='<span>'+msg+'</span>'
+  }
+  function maybeShowScene(){
+    const el=document.getElementById('load')
+    if(el&&el.style.display!=='none'&&_shellDone&&Object.keys(_templates).length)el.style.display='none'
+  }
+  function finalize(){
+    if(_finalized)return
+    _finalized=true
+    document.getElementById('load').style.display='none'
+    sc.children.forEach(c=>{if(c.userData?.isRack)updateRackLabel(c.userData)})
+    loadState()
+    connectRealData()
+  }
+  function addTemplate(type,t){
+    if(_templates[type])return
+    _templates[type]=t
+    fillType(type)
+    maybeShowScene()
+    updateLoadUI(false)
+    if(LOAD_TYPES.every(x=>_templates[x]))finalize()
+  }
+
+  // ── LOAD TEMPLATES (parallel; scene paints as each arrives) ──
+  const ok=(p)=>(u,fn)=>p(u).then(g=>fn(g)).catch(e=>err(u,e))
+  ok(loadGLB)('models/m16.glb',g=>addTemplate('m16',prep(g.scene)))
+  ok(loadGLB)('models/ak47.glb',g=>{const t=prep(g.scene);t.rotation.y=-Math.PI/2;addTemplate('ak47',t)})
+  ok(loadGLB)('models/uzi.glb',g=>{const t=prep(g.scene);t.scale.multiplyScalar(.47);addTemplate('uzi',t)})
+  ok(loadGLB)('models/sr25.glb',g=>addTemplate('sr25',prep(g.scene)))
+  ok(loadGLB)('models/negev.glb',g=>addTemplate('negev',prep(g.scene)))
+  ok(loadGLB)('models/m60.glb',g=>{const t=prep(g.scene);t.scale.multiplyScalar(1.05);addTemplate('m60',t)})
+  ok(loadGLB)('models/mg42.glb',g=>{const t=prep(g.scene);t.scale.multiplyScalar(1.22);addTemplate('mg42',t)})
+  ok(loadGLB)('models/c90.glb',g=>addTemplate('c90',prep(g.scene)))
+  ok(loadGLB)('models/rpg7.glb',g=>{const t=prep(g.scene);t.scale.multiplyScalar(.95);t.rotation.y=-Math.PI/2;addTemplate('rpg',t)})
+  ok(loadFBX)('models/m4a1_oga/M4A1.fbx',g=>{applyTex(g,'models/m4a1_oga/',{map:'M4A1_Base_Color.png',normalMap:'M4A1_Normal.png',metalnessMap:'M4A1_Metallic.png',roughnessMap:'M4A1_Roughness.png'});const t=prep(g.isGroup?g:g.scene);t.scale.multiplyScalar(.84);addTemplate('cq',t)})
+  ok(loadFBX)('models/g3_model/Gun.fbx',g=>{applyTex(g,'models/g3_model/',{map:'Texture_Base_Color.png',normalMap:'Texture_Normal.png',metalnessMap:'Texture_Metallic.png',roughnessMap:'Texture_Roughness.png',aoMap:'Texture_Mixed_AO.png'});g.traverse(c=>{if(c.isMesh&&c.material){const m=Array.isArray(c.material)?c.material:[c.material];m.forEach(m=>{m.color=new T.Color(0x2e2e2e);m.roughness=.5;m.metalness=.4;m.envMapIntensity=1.2})}});const t=prep(g);t.scale.multiplyScalar(1.02);addTemplate('g3',t)})
+  const _loadFail=[]
+  const err=(u,e)=>{_loadFail.push(u);console.error('LOAD FAIL '+u,e);const el=document.getElementById('load');if(el&&el.style.display!=='none')el.innerHTML='<span style="color:#c04040">ERROR loading '+u+'</span>'}
+  setTimeout(()=>updateLoadUI(true),15000)
+  window.__load=()=>({
+    racks:sc.children.filter(c=>c.userData?.isRack).length,
+    tpl:LOAD_TYPES.filter(t=>_templates[t]).length,total:LOAD_TYPES.length,
+    guns:sc.children.reduce((n,c)=>n+(c.userData?.a1G?.length||0)+(c.userData?.a2G?.length||0),0),
+    done:_finalized
+  })
 
 // ── WASD MOVEMENT ──
 const keys={}

@@ -11,7 +11,7 @@ const bgCol=new T.Color(0x1e1913)
 const cam=new T.PerspectiveCamera(50,innerWidth/innerHeight,0.1,120)
 cam.position.set(0,2.5,3.4)
 
-const rdr=new T.WebGLRenderer({antialias:true,powerPreference:'high-performance'})
+const rdr=new T.WebGLRenderer({antialias:false,powerPreference:'high-performance'})
 const _prSteps=[2,1.75,1.5,1.25,1]
 const _MAXPR=Math.min(devicePixelRatio||1,2)
 let _curPr=_MAXPR,_prGuard=0

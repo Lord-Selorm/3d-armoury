@@ -22,6 +22,11 @@ body{overflow:hidden;background:#08080c;font-family:'Segoe UI',Arial,sans-serif}
 #inspGun{position:fixed;inset:0;z-index:13;display:none;width:100%;height:100%;cursor:grab;touch-action:none}
 #inspGun:active{cursor:grabbing}
 #badge b{color:#e07040}
+#perfctl{position:fixed;top:110px;right:20px;z-index:10;display:flex;align-items:center;gap:6px;font-family:'Segoe UI',Arial,sans-serif}
+#perfctl #fps{color:#f0e8e0;font-size:12px;min-width:66px;text-align:right;text-shadow:0 1px 4px #000}
+#perfctl button{background:rgba(20,15,10,.78);border:1px solid #8a7a6a;color:#e8d8c0;font-size:12px;padding:3px 8px;border-radius:3px;cursor:pointer}
+#perfctl button:hover{border-color:#b0906a}
+#perfctl button.act{background:#8a6a45;color:#fff;border-color:#b0906a}
 #rst{position:fixed;top:46px;right:20px;z-index:10;background:rgba(100,30,20,.7);color:#e8c0b0;padding:5px 12px;border-radius:4px;font:12px/1.4 'Segoe UI',Arial,sans-serif;border:1px solid #7a3a2a;cursor:pointer;display:none}
 #rst:hover{background:rgba(140,40,30,.85)}
 #log{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:150;display:none;width:520px;max-width:92%;max-height:70vh;background:rgba(12,12,20,.96);color:#d8cbb8;border-radius:8px;border:1.5px solid #5a4a3a;font:12px/1.6 'Segoe UI',Arial,sans-serif;flex-direction:column}

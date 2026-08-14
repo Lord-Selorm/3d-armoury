@@ -14,10 +14,12 @@ cam.position.set(0,2.5,3.4)
 const rdr=new T.WebGLRenderer({antialias:false,powerPreference:'high-performance'})
 const _prSteps=[2,1.75,1.5,1.25,1]
 const _MAXPR=Math.min(devicePixelRatio||1,2)
-let _curPr=_MAXPR,_prGuard=0
+let _curPr=_MAXPR,_prGuard=0,_autoOn=true
 const _prSamples=[]
+let _fpsCount=0
 function _applyPr(idx){_curPr=_prSteps[idx];rdr.setPixelRatio(_curPr)}
 function _autoPr(){
+  if(!_autoOn)return
   if(_prSamples.length<30)return
   let s=0;for(const v of _prSamples)s+=v
   const avg=s/_prSamples.length
@@ -26,6 +28,25 @@ function _autoPr(){
   if(avg>170&&i<_prSteps.length-1)_applyPr(i+1)
   else if(avg<=95&&i>0&&_prSteps[i-1]<=_MAXPR)_applyPr(i-1)
 }
+function __setMode(m){
+  if(m===2){_autoOn=false;_applyPr(_prSteps.indexOf(Math.min(devicePixelRatio||1,2)));rdr.shadowMap.enabled=true}
+  else if(m===1){_autoOn=true;_curPr=_MAXPR;rdr.setPixelRatio(_curPr);rdr.shadowMap.enabled=true}
+  else{_autoOn=false;_applyPr(_prSteps.indexOf(1));rdr.shadowMap.enabled=false}
+  _prSamples.length=0
+  localStorage.setItem('armouryPr',m)
+  document.querySelectorAll('#perfctl button').forEach(b=>b.classList.toggle('act',+b.dataset.mode===m))
+}
+window.__setMode=__setMode
+__setMode(parseInt(localStorage.getItem('armouryPr')||'1',10))
+document.addEventListener('click',e=>{
+  const b=e.target.closest&&e.target.closest('#perfctl button')
+  if(b)__setMode(+b.dataset.mode)
+})
+setInterval(()=>{
+  const el=document.getElementById('fps')
+  if(el)el.textContent=_fpsCount+(rdr.shadowMap.enabled?'':' ⚡')+' FPS · '+rdr.getPixelRatio()+'×'
+  _fpsCount=0
+},1000)
 rdr.setPixelRatio(_curPr)
 rdr.setSize(innerWidth,innerHeight)
 rdr.toneMapping=T.ACESFilmicToneMapping
@@ -1407,6 +1428,7 @@ function tick(){
   if(!_animCam()&&!_inspect)ctrl.update()
   const _tm0=performance.now()
   rdr.render(sc,cam);ldr.render(sc,cam)
+  _fpsCount++
   _prSamples.push(performance.now()-_tm0)
   if(_prSamples.length>90)_prSamples.shift()
   if(++_prGuard>=60){_prGuard=0;_autoPr()}
